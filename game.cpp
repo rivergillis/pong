@@ -15,7 +15,7 @@ SDL_Window* gWindow = NULL;
 //The window renderer
 SDL_Renderer* gRenderer = NULL;
 
-bool init()
+bool init(TexturePack* textures)
 {
   //Initialization flag
   bool success = true;
@@ -66,6 +66,12 @@ bool init()
     }
   }
 
+  //TODO: Refactor above
+  //TODO: use seperate texture pack for fonts
+  for (int i = 0; i < TextureName::TOTAL_NUM_TEXTURES; ++i) {
+    textures->initTexture(static_cast<TextureName>(i), gRenderer);
+  }
+
   return success;
 }
 
@@ -109,7 +115,7 @@ int main(int argc, char *args[])
 {
   TexturePack textures;
 
-  if (!init()) {
+  if (!init(&textures)) {
     printf("Failed to initialize main game!\n");
     return -1;
   }

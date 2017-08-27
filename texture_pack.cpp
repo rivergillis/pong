@@ -20,6 +20,11 @@ Texture* TexturePack::getTexture(TextureName name) {
   return &textures_[name];
 }
 
+void TexturePack::initTexture(TextureName name, SDL_Renderer* renderer, TTF_Font* font) {
+  textures_[name].init(renderer, font);
+}
+
+
 std::string TexturePack::texturePath(TextureName name) {
   switch(name) {
     case TextureName::BALL:

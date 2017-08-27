@@ -21,6 +21,8 @@ class TexturePack {
 
   std::string texturePath(TextureName name);
 
+  void initTexture(TextureName name, SDL_Renderer* renderer, TTF_Font* font = nullptr);
+
  private:
   std::vector<Texture> textures_;
 };
