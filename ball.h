@@ -1,6 +1,8 @@
 #ifndef BALL_H_
 #define BALL_H_
 
+#include <vector>
+
 #include "texture.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
@@ -26,7 +28,7 @@ public:
   void handleEvent(SDL_Event& e);
 
   //Moves the ball and checks collision
-  void move(SDL_Rect& wall);
+  void move(double deltaTime, std::vector<SDL_Rect>& colliders);
 
   //Shows the ball on the screen
   void render(Texture* texture);

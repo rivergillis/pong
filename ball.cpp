@@ -67,30 +67,55 @@ void Ball::handleEvent(SDL_Event& e)
   }
 }
 
-void Ball::move(SDL_Rect& wall)
+void Ball::move(double deltaTime, std::vector<SDL_Rect>& colliders)
 {
   //Move the dot left or right
-  posX_ += velX_;
+  // Perfect delta is 16.6666...
+  int delta_vel_x = double(velX_ / 16.667) * deltaTime;
+  posX_ += delta_vel_x;
   collider_.x = posX_;
 
+  // TODO: score on going to the ends of the X screen
+
   //If the dot collided or went too far to the left or right
-  if ((posX_ < 0) || (posX_ + DOT_WIDTH > constants::SCREEN_WIDTH) || checkCollision(collider_, wall))
+  if ((posX_ < 0) || (posX_ + DOT_WIDTH > constants::SCREEN_WIDTH))
   {
     //Move back
-    posX_ -= velX_;
+    posX_ -= delta_vel_x;
     collider_.x = posX_;
+  } else {
+    // check new x collisions
+    for (const auto& outside_collider : colliders) {
+      if (checkCollision(collider_, outside_collider)) {
+        // Move back
+        posX_ -= delta_vel_x;
+        collider_.x = posX_;
+        break;
+      }
+    }
   }
 
   //Move the dot up or down
-  posY_ += velY_;
+  int delta_vel_y = double(velY_ / 16.667) * deltaTime;
+  posY_ += delta_vel_y;
   collider_.y = posY_;
 
   //If the dot collided or went too far up or down
-  if ((posY_ < 0) || (posY_ + DOT_HEIGHT > constants::SCREEN_HEIGHT) || checkCollision(collider_, wall))
+  if ((posY_ < 0) || (posY_ + DOT_HEIGHT > constants::SCREEN_HEIGHT))
   {
     //Move back
-    posY_ -= velY_;
+    posY_ -= delta_vel_y;
     collider_.y = posY_;
+  } else {
+    // check new y collisions
+    for (const auto& outside_collider : colliders) {
+      if (checkCollision(collider_, outside_collider)) {
+        //Move back
+        posY_ -= delta_vel_y;
+        collider_.y = posY_;
+        break;
+      }
+    }
   }
 }
 

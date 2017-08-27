@@ -1,3 +1,5 @@
+#include <vector>
+
 #include "texture.h"
 #include "texture_pack.h"
 #include "ball.h"
@@ -123,7 +125,11 @@ void gameLoop(TexturePack* textures) {
   wall.x = 300;
   wall.y = 40;
   wall.w = 40;
-  wall.h = 400;  
+  wall.h = 400;
+
+  std::vector<SDL_Rect> ball_colliders;
+
+  ball_colliders.push_back(wall);
 
   Uint64 time_now = SDL_GetPerformanceCounter();
   Uint64 time_last = 0;
@@ -148,7 +154,7 @@ void gameLoop(TexturePack* textures) {
       ball.handleEvent(e);
     }
 
-    ball.move(wall);
+    ball.move(deltaTime, ball_colliders);
 
     //Clear screen
     SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
