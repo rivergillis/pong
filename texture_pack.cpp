@@ -27,6 +27,9 @@ void TexturePack::initTexture(TextureName name, SDL_Renderer* renderer, TTF_Font
 
 std::string TexturePack::texturePath(TextureName name) {
   switch(name) {
+    case TextureName::BG:
+      return "textures/bg.png";
+      break;
     case TextureName::BALL:
       return "textures/ball.png";
       break;

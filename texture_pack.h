@@ -6,7 +6,8 @@
 #include "texture.h"
 
 enum TextureName {
-  BALL = 0,
+  BG = 0,
+  BALL,
   PADDLE,
   TOTAL_NUM_TEXTURES
 };

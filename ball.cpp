@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <string>
 
-Ball::Ball(SDL_Renderer* renderer) : ballTexture_(renderer)
+Ball::Ball()
 {
   //Initialize the offsets
   posX_ = 0;
@@ -94,8 +94,8 @@ void Ball::move(SDL_Rect& wall)
   }
 }
 
-void Ball::render()
+void Ball::render(Texture* texture)
 {
   //Show the dot
-  ballTexture_.render(posX_, posY_);
+  texture->render(posX_, posY_);
 }

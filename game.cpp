@@ -111,6 +111,64 @@ void close(TexturePack* textures)
   SDL_Quit();
 }
 
+void gameLoop(TexturePack* textures) {
+  bool quit = false;
+
+  SDL_Event e;
+
+  Ball ball;
+
+  //Set the wall
+  SDL_Rect wall;
+  wall.x = 300;
+  wall.y = 40;
+  wall.w = 40;
+  wall.h = 400;  
+
+  Uint64 time_now = SDL_GetPerformanceCounter();
+  Uint64 time_last = 0;
+  double deltaTime = 0;
+
+  while (!quit) {
+    time_last = time_now;
+    time_now = SDL_GetPerformanceCounter();
+ 
+    deltaTime = ((time_now - time_last)*1000 / (double)SDL_GetPerformanceFrequency());
+
+    printf("Time passed: %f\n", deltaTime);
+
+    //Handle events on queue
+    while(SDL_PollEvent(&e) != 0) {
+      //User requests quit
+      if(e.type == SDL_QUIT) {
+        quit = true;
+      }
+
+      //Handle input for the dot
+      ball.handleEvent(e);
+    }
+
+    ball.move(wall);
+
+    //Clear screen
+    SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
+    SDL_RenderClear(gRenderer);
+
+    //Render bg
+    textures->getTexture(TextureName::BG)->render(0, 0);
+
+    //Render wall
+    SDL_SetRenderDrawColor(gRenderer, 0x00, 0x00, 0x00, 0xFF);		
+    SDL_RenderDrawRect(gRenderer, &wall);
+    
+    //Render dot
+    ball.render(textures->getTexture(TextureName::BALL));
+
+    //Update screen
+    SDL_RenderPresent(gRenderer);
+  }
+}
+
 int main(int argc, char *args[])
 {
   TexturePack textures;
@@ -124,4 +182,10 @@ int main(int argc, char *args[])
     printf("Failed to load media!\n");
     return -1;
   }
+
+  gameLoop(&textures);
+
+  close(&textures);
+
+  return 0;
 }
