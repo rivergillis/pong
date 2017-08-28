@@ -37,7 +37,7 @@ bool init(TexturePack* textures)
     }
 
     //Create window
-    gWindow = SDL_CreateWindow("SDL Tutorial", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, constants::SCREEN_WIDTH, constants::SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+    gWindow = SDL_CreateWindow("Pong", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, constants::SCREEN_WIDTH, constants::SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
     if (gWindow == NULL)
     {
       printf("Window could not be created! SDL Error: %s\n", SDL_GetError());
@@ -141,7 +141,7 @@ void gameLoop(TexturePack* textures) {
  
     deltaTime = ((time_now - time_last)*1000 / (double)SDL_GetPerformanceFrequency());
 
-    printf("Time passed: %f\n", deltaTime);
+    // printf("Time passed: %f\n", deltaTime);
 
     //Handle events on queue
     while(SDL_PollEvent(&e) != 0) {

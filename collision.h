@@ -5,4 +5,8 @@
 
 bool checkCollision(SDL_Rect a, SDL_Rect b);
 
+int checkCollisionX(SDL_Rect a, SDL_Rect b);
+
+int checkCollisionY(SDL_Rect a, SDL_Rect b);
+
 #endif

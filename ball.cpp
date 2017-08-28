@@ -86,11 +86,22 @@ void Ball::move(double deltaTime, std::vector<SDL_Rect>& colliders)
   } else {
     // check new x collisions
     for (const auto& outside_collider : colliders) {
-      if (checkCollision(collider_, outside_collider)) {
-        // Move back
-        posX_ -= delta_vel_x;
-        collider_.x = posX_;
+      // make sure to only check if there's an actual collision
+      if (!checkCollision(collider_, outside_collider)) {
         break;
+      }
+
+      int collision = checkCollisionX(collider_, outside_collider);
+      if (collision == 1) {
+        // ball touches the right side coming from the right
+        printf("Ball has touched the right side of the wall!\n");
+        posX_ = outside_collider.x + outside_collider.w;
+        collider_.x = posX_;
+      } else if (collision == -1) {
+        // ball touches the left side coming from the left
+        printf("Ball has touched the left side of the wall!\n");
+        posX_ = outside_collider.x - collider_.w;
+        collider_.x = posX_;
       }
     }
   }
@@ -109,14 +120,26 @@ void Ball::move(double deltaTime, std::vector<SDL_Rect>& colliders)
   } else {
     // check new y collisions
     for (const auto& outside_collider : colliders) {
-      if (checkCollision(collider_, outside_collider)) {
-        //Move back
-        posY_ -= delta_vel_y;
-        collider_.y = posY_;
+      // make sure to only check if there's an actual collision
+      if (!checkCollision(collider_, outside_collider)) {
         break;
+      }
+
+      int collision = checkCollisionY(collider_, outside_collider);
+      if (collision == 1) {
+        // ball touches the bottom side 
+        printf("Ball has touched the bottom side of the wall!\n");
+        posY_ = outside_collider.y + outside_collider.h + 1;
+        collider_.y = posY_;
+      } else if (collision == -1) {
+        // ball touches the top side
+        printf("Ball has touched the top side of the wall!\n");
+        posY_ = outside_collider.y - collider_.h;
+        collider_.y = posY_;
       }
     }
   }
+  printf("x: %d, y: %d, \ncollider x: %d, collider y: %d", posX_, posY_, collider_.x, collider_.y);
 }
 
 void Ball::render(Texture* texture)
