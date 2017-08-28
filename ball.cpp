@@ -91,6 +91,10 @@ void Ball::Move(double delta_time, std::vector<SDL_Rect>& colliders)
 
   for (auto& outside_collider : colliders) {
     std::pair<int, int> fixed_points = CheckCollisionWithPoints(collider_, outside_collider, delta_vel_x, delta_vel_y);
+    // no collision
+    if (x_pos_ == fixed_points.first && y_pos_ == fixed_points.second) {
+      continue;
+    }
     x_pos_ = fixed_points.first;
     y_pos_ = fixed_points.second;
     collider_.x = x_pos_;
@@ -98,7 +102,7 @@ void Ball::Move(double delta_time, std::vector<SDL_Rect>& colliders)
     printf("Moved ball to x: %d, y: %d\n", x_pos_, y_pos_); 
   }
 
-  printf("x: %d, y: %d, \ncollider x: %d, collider y: %d", x_pos_, y_pos_, collider_.x, collider_.y);
+  // printf("x: %d, y: %d, \ncollider x: %d, collider y: %d", x_pos_, y_pos_, collider_.x, collider_.y);
 }
 
 void Ball::Render(Texture* texture) {
