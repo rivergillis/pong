@@ -164,7 +164,7 @@ void gameLoop(TexturePack* textures) {
     textures->getTexture(TextureName::BG)->render(0, 0);
 
     //Render wall
-    SDL_SetRenderDrawColor(gRenderer, 0x00, 0x00, 0x00, 0xFF);		
+    SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);		
     SDL_RenderDrawRect(gRenderer, &wall);
     
     //Render dot
