@@ -135,9 +135,6 @@ void GameLoop(TexturePack* textures) {
       if(e.type == SDL_QUIT) {
         quit = true;
       }
-
-      //Handle input for the dot
-      ball.HandleEvent(e);
     }
 
     ball.Move(delta_time, ball_colliders);

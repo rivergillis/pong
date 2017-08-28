@@ -7,8 +7,9 @@
 #include <SDL2/SDL_ttf.h>
 #include <stdio.h>
 #include <string>
+#include <random>
 
-Ball::Ball() {
+Ball::Ball() : rng_((std::random_device())()) {
   //Initialize the offsets
   x_pos_ = 0;
   y_pos_ = 0;
@@ -17,51 +18,33 @@ Ball::Ball() {
   collider_.w = BALL_WIDTH;
   collider_.h = BALL_HEIGHT;
 
-  //Initialize the velocity
-  x_vel_ = 0;
-  y_vel_ = 0;
-}
+  // TODO: move this to an Init() method
 
-void Ball::HandleEvent(SDL_Event& e) {
-  //If a key was pressed
-  if (e.type == SDL_KEYDOWN && e.key.repeat == 0) {
-    //Adjust the velocity
-    switch (e.key.keysym.sym) {
-    case SDLK_UP:
-      y_vel_ -= BALL_VEL;
-      break;
-    case SDLK_DOWN:
-      y_vel_ += BALL_VEL;
-      break;
-    case SDLK_LEFT:
-      x_vel_ -= BALL_VEL;
-      break;
-    case SDLK_RIGHT:
-      x_vel_ += BALL_VEL;
-      break;
-    }
-  } else if (e.type == SDL_KEYUP && e.key.repeat == 0) {
-    //If a key was released
-    //Adjust the velocity
-    switch (e.key.keysym.sym) {
-    case SDLK_UP:
-      y_vel_ += BALL_VEL;
-      break;
-    case SDLK_DOWN:
-      y_vel_ -= BALL_VEL;
-      break;
-    case SDLK_LEFT:
-      x_vel_ += BALL_VEL;
-      break;
-    case SDLK_RIGHT:
-      x_vel_ -= BALL_VEL;
-      break;
-    }
+  // up to 30% of ball's initial velocity can be vertical
+  std::uniform_int_distribution<int> uni(0, BALL_VEL / 3);
+  y_vel_ = uni(rng_);
+
+  // rest goes to horizontal velocity
+  x_vel_ = BALL_VEL - y_vel_;
+
+  // determine what side to send the ball towards
+  std::uniform_int_distribution<int> coin_flipper(0,1);
+  auto coin_side = coin_flipper(rng_);
+
+  if (coin_side == 0) {
+    x_vel_ *= -1;
   }
+
+  coin_side = coin_flipper(rng_);
+
+  if (coin_side == 0) {
+    y_vel_ *= -1;
+  }
+
+  printf("init ball with xvel: %d, yvel: %d\n", x_vel_, y_vel_);
 }
 
-void Ball::Move(double delta_time, std::vector<SDL_Rect>& colliders)
-{
+void Ball::Move(double delta_time, std::vector<SDL_Rect>& colliders) {
   //Move the dot left or right
   // Perfect delta is 16.6666...
   int delta_vel_x = double(x_vel_ / 16.667) * delta_time;

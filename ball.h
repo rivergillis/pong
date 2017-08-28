@@ -9,6 +9,8 @@
 #include <SDL2/SDL_ttf.h>
 #include <stdio.h>
 #include <string>
+#include <random>
+
 
 //The ball that will move around on the screen
 class Ball {
@@ -22,9 +24,6 @@ class Ball {
 
   //Initializes the variables
   Ball();
-
-  //Takes key presses and adjusts the ball's velocity
-  void HandleEvent(SDL_Event& e);
 
   //Moves the ball and checks collision
   void Move(double delta_time, std::vector<SDL_Rect>& colliders);
@@ -41,6 +40,9 @@ private:
 
   //Ball's collision box
   SDL_Rect collider_;
+
+  // random generator
+  std::mt19937 rng_;
 };
 
 #endif
