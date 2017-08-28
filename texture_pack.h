@@ -18,11 +18,11 @@ class TexturePack {
 
   ~TexturePack();
 
-  Texture* getTexture(TextureName name);
+  Texture* GetTexture(TextureName name);
 
-  std::string texturePath(TextureName name);
+  std::string TexturePath(TextureName name);
 
-  void initTexture(TextureName name, SDL_Renderer* renderer, TTF_Font* font = nullptr);
+  void InitTexture(TextureName name, SDL_Renderer* renderer, TTF_Font* font = nullptr);
 
  private:
   std::vector<Texture> textures_;

@@ -12,55 +12,43 @@
 #include <string>
 
 //The window we'll be rendering to
-SDL_Window* gWindow = NULL;
+SDL_Window* window = NULL;
 
 //The window renderer
-SDL_Renderer* gRenderer = NULL;
+SDL_Renderer* renderer = NULL;
 
-bool init(TexturePack* textures)
-{
+bool Init(TexturePack* textures) {
   //Initialization flag
   bool success = true;
 
   //Initialize SDL
-  if (SDL_Init(SDL_INIT_VIDEO) < 0)
-  {
+  if (SDL_Init(SDL_INIT_VIDEO) < 0) {
     printf("SDL could not initialize! SDL Error: %s\n", SDL_GetError());
     success = false;
-  }
-  else
-  {
+  } else {
     //Set texture filtering to linear
-    if (!SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1"))
-    {
+    if (!SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1")) {
       printf("Warning: Linear texture filtering not enabled!");
     }
 
     //Create window
-    gWindow = SDL_CreateWindow("Pong", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, constants::SCREEN_WIDTH, constants::SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
-    if (gWindow == NULL)
-    {
+    window = SDL_CreateWindow("Pong", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, constants::SCREEN_WIDTH, constants::SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+    if (window == NULL) {
       printf("Window could not be created! SDL Error: %s\n", SDL_GetError());
       success = false;
-    }
-    else
-    {
+    } else {
       //Create vsynced renderer for window
-      gRenderer = SDL_CreateRenderer(gWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-      if (gRenderer == NULL)
-      {
+      renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+      if (renderer == NULL) {
         printf("Renderer could not be created! SDL Error: %s\n", SDL_GetError());
         success = false;
-      }
-      else
-      {
+      } else {
         //Initialize renderer color
-        SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
+        SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
 
         //Initialize PNG loading
-        int imgFlags = IMG_INIT_PNG;
-        if (!(IMG_Init(imgFlags) & imgFlags))
-        {
+        int img_flags = IMG_INIT_PNG;
+        if (!(IMG_Init(img_flags) & img_flags)) {
           printf("SDL_image could not initialize! SDL_image Error: %s\n", IMG_GetError());
           success = false;
         }
@@ -71,21 +59,21 @@ bool init(TexturePack* textures)
   //TODO: Refactor above
   //TODO: use seperate texture pack for fonts
   for (int i = 0; i < TextureName::TOTAL_NUM_TEXTURES; ++i) {
-    textures->initTexture(static_cast<TextureName>(i), gRenderer);
+    textures->InitTexture(static_cast<TextureName>(i), renderer);
   }
 
   return success;
 }
 
-bool loadMedia(TexturePack* textures)
+bool LoadMedia(TexturePack* textures)
 {
   //Loading success flag
   bool success = true;
 
   for (int i = 0; i < TextureName::TOTAL_NUM_TEXTURES; ++i) {
-    Texture* current = textures->getTexture(static_cast<TextureName>(i));
-    std::string path = textures->texturePath(static_cast<TextureName>(i));
-    if (!current->loadFromFile(path)) {
+    Texture* current = textures->GetTexture(static_cast<TextureName>(i));
+    std::string path = textures->TexturePath(static_cast<TextureName>(i));
+    if (!current->LoadFromFile(path)) {
       printf("Failed to load texture: %s\n", path.c_str());
       success = false;
     }
@@ -94,26 +82,26 @@ bool loadMedia(TexturePack* textures)
   return success;
 }
 
-void close(TexturePack* textures)
+void Close(TexturePack* textures)
 {
   //Free loaded images
   for (int i = 0; i < TextureName::TOTAL_NUM_TEXTURES; ++i) {
-    Texture* current = textures->getTexture(static_cast<TextureName>(i));
-    current->free();    
+    Texture* current = textures->GetTexture(static_cast<TextureName>(i));
+    current->Free();    
   }
 
   //Destroy window
-  SDL_DestroyRenderer(gRenderer);
-  SDL_DestroyWindow(gWindow);
-  gWindow = NULL;
-  gRenderer = NULL;
+  SDL_DestroyRenderer(renderer);
+  SDL_DestroyWindow(window);
+  window = NULL;
+  renderer = NULL;
 
   //Quit SDL subsystems
   IMG_Quit();
   SDL_Quit();
 }
 
-void gameLoop(TexturePack* textures) {
+void GameLoop(TexturePack* textures) {
   bool quit = false;
 
   SDL_Event e;
@@ -133,15 +121,13 @@ void gameLoop(TexturePack* textures) {
 
   Uint64 time_now = SDL_GetPerformanceCounter();
   Uint64 time_last = 0;
-  double deltaTime = 0;
+  double delta_time = 0;
 
   while (!quit) {
     time_last = time_now;
     time_now = SDL_GetPerformanceCounter();
  
-    deltaTime = ((time_now - time_last)*1000 / (double)SDL_GetPerformanceFrequency());
-
-    // printf("Time passed: %f\n", deltaTime);
+    delta_time = ((time_now - time_last)*1000 / (double)SDL_GetPerformanceFrequency());
 
     //Handle events on queue
     while(SDL_PollEvent(&e) != 0) {
@@ -151,47 +137,46 @@ void gameLoop(TexturePack* textures) {
       }
 
       //Handle input for the dot
-      ball.handleEvent(e);
+      ball.HandleEvent(e);
     }
 
-    ball.move(deltaTime, ball_colliders);
+    ball.Move(delta_time, ball_colliders);
 
     //Clear screen
-    SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
-    SDL_RenderClear(gRenderer);
+    SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+    SDL_RenderClear(renderer);
 
     //Render bg
-    textures->getTexture(TextureName::BG)->render(0, 0);
+    textures->GetTexture(TextureName::BG)->Render(0, 0);
 
     //Render wall
-    SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);		
-    SDL_RenderDrawRect(gRenderer, &wall);
+    SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);		
+    SDL_RenderDrawRect(renderer, &wall);
     
     //Render dot
-    ball.render(textures->getTexture(TextureName::BALL));
+    ball.Render(textures->GetTexture(TextureName::BALL));
 
     //Update screen
-    SDL_RenderPresent(gRenderer);
+    SDL_RenderPresent(renderer);
   }
 }
 
-int main(int argc, char *args[])
-{
+int main(int argc, char *args[]) {
   TexturePack textures;
 
-  if (!init(&textures)) {
+  if (!Init(&textures)) {
     printf("Failed to initialize main game!\n");
     return -1;
   }
 
-  if (!loadMedia(&textures)) {
+  if (!LoadMedia(&textures)) {
     printf("Failed to load media!\n");
     return -1;
   }
 
-  gameLoop(&textures);
+  GameLoop(&textures);
 
-  close(&textures);
+  Close(&textures);
 
   return 0;
 }

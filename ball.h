@@ -11,34 +11,33 @@
 #include <string>
 
 //The ball that will move around on the screen
-class Ball
-{
-public:
+class Ball {
+ public:
   //The dimensions of the ball
-  static const int DOT_WIDTH = 30;
-  static const int DOT_HEIGHT = 30;
+  static const int BALL_WIDTH = 30;
+  static const int BALL_HEIGHT = 30;
 
   //Maximum axis velocity of the ball
-  static const int DOT_VEL = 10;
+  static const int BALL_VEL = 10;
 
   //Initializes the variables
   Ball();
 
   //Takes key presses and adjusts the ball's velocity
-  void handleEvent(SDL_Event& e);
+  void HandleEvent(SDL_Event& e);
 
   //Moves the ball and checks collision
-  void move(double deltaTime, std::vector<SDL_Rect>& colliders);
+  void Move(double delta_time, std::vector<SDL_Rect>& colliders);
 
   //Shows the ball on the screen
-  void render(Texture* texture);
+  void Render(Texture* texture);
 
 private:
   //The X and Y offsets of the ball
-  int posX_, posY_;
+  int x_pos_, y_pos_;
 
   //The velocity of the ball
-  int velX_, velY_;
+  int x_vel_, y_vel_;
 
   //Ball's collision box
   SDL_Rect collider_;

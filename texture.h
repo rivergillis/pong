@@ -9,60 +9,60 @@
 
 class Texture
 {
-	public:
-		//Initializes variables
-		Texture();
+ public:
+	//Initializes variables
+	Texture();
 
-		// automatically inits
-		Texture(SDL_Renderer* renderer, TTF_Font* font = nullptr);
+	// automatically inits
+	Texture(SDL_Renderer* renderer, TTF_Font* font = nullptr);
 
-		//Deallocates memory
-		~Texture();
+	//Deallocates memory
+	~Texture();
 
-		void init(SDL_Renderer* renderer, TTF_Font* font = nullptr);
+	void Init(SDL_Renderer* renderer, TTF_Font* font = nullptr);
 
-		//Loads image at specified path
-		bool loadFromFile(std::string path);
-		
-		#ifdef _SDL_TTF_H
-		//Creates image from font string
-		bool loadFromRenderedText(std::string textureText, SDL_Color textColor);
-		#endif
+	//Loads image at specified path
+	bool LoadFromFile(std::string path);
 
-		//Deallocates texture
-		void free();
+	#ifdef _SDL_TTF_H
+	//Creates image from font string
+	bool LoadFromRenderedText(std::string texture_text, SDL_Color text_color);
+	#endif
 
-		//Set color modulation
-		void setColor(Uint8 red, Uint8 green, Uint8 blue);
+	//Deallocates texture
+	void Free();
 
-		//Set blending
-		void setBlendMode(SDL_BlendMode blending);
+	//Set color modulation
+	void SetColor(Uint8 red, Uint8 green, Uint8 blue);
 
-		//Set alpha modulation
-		void setAlpha(Uint8 alpha);
-		
-		//Renders texture at given point
-		void render(int x, int y, SDL_Rect* clip = NULL, double angle = 0.0, SDL_Point* center = NULL, SDL_RendererFlip flip = SDL_FLIP_NONE);
+	//Set blending
+	void SetBlendMode(SDL_BlendMode blending);
 
-		//Gets image dimensions
-		int getWidth();
-		int getHeight();
+	//Set alpha modulation
+	void SetAlpha(Uint8 alpha);
 
-	private:
-		//The actual hardware texture
-		SDL_Texture* texture_;
+	//Renders texture at given point
+	void Render(int x, int y, SDL_Rect* clip = NULL, double angle = 0.0, SDL_Point* center = NULL, SDL_RendererFlip flip = SDL_FLIP_NONE);
 
-		// The renderer we're using to render this texture
-		SDL_Renderer* renderer_;
+	//Gets image dimensions
+	int GetWidth();
+	int GetHeight();
 
-		// The font we're using for this texture
-		TTF_Font* font_;
+ private:
+	//The actual hardware texture
+	SDL_Texture* texture_;
 
-		//Image dimensions
-		int width_;
-		int height_;
+	// The renderer we're using to render this texture
+	SDL_Renderer* renderer_;
 
-		bool has_init_;
+	// The font we're using for this texture
+	TTF_Font* font_;
+
+	//Image dimensions
+	int width_;
+	int height_;
+
+	bool has_init_;
 };
 
 #endif

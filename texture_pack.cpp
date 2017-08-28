@@ -12,20 +12,20 @@ TexturePack::TexturePack() {
 
 TexturePack::~TexturePack() {
   for (auto& tex : textures_) {
-    tex.free();
+    tex.Free();
   }
 }
 
-Texture* TexturePack::getTexture(TextureName name) {
+Texture* TexturePack::GetTexture(TextureName name) {
   return &textures_[name];
 }
 
-void TexturePack::initTexture(TextureName name, SDL_Renderer* renderer, TTF_Font* font) {
-  textures_[name].init(renderer, font);
+void TexturePack::InitTexture(TextureName name, SDL_Renderer* renderer, TTF_Font* font) {
+  textures_[name].Init(renderer, font);
 }
 
 
-std::string TexturePack::texturePath(TextureName name) {
+std::string TexturePack::TexturePath(TextureName name) {
   switch(name) {
     case TextureName::BG:
       return "textures/bg.png";
@@ -37,6 +37,7 @@ std::string TexturePack::texturePath(TextureName name) {
       return "textures/paddle.png";
       break;
     case TextureName::TOTAL_NUM_TEXTURES:
+      printf("Tried to access texture for TOTAL_NUM_TEXTURES!\n");
       return "";
       break;
   }

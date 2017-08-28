@@ -5,12 +5,12 @@
 
 #include <SDL2/SDL.h>
 
-bool checkCollision(SDL_Rect a, SDL_Rect b);
+bool CheckCollision(SDL_Rect a, SDL_Rect b);
 
-int checkCollisionX(SDL_Rect a, SDL_Rect b);
+int CheckCollisionX(SDL_Rect a, SDL_Rect b);
 
-int checkCollisionY(SDL_Rect a, SDL_Rect b);
+int CheckCollisionY(SDL_Rect a, SDL_Rect b);
 
-std::pair<int, int> checkCollisionWithPoints(SDL_Rect a, SDL_Rect b, int vel_x, int vel_y);
+std::pair<int, int> CheckCollisionWithPoints(SDL_Rect a, SDL_Rect b, int vel_x, int vel_y);
 
 #endif

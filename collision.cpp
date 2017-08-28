@@ -5,7 +5,7 @@
 #include <SDL2/SDL.h>
 
 // Returns the point at which A needs to be moved to to avoid collision.
-std::pair<int, int> checkCollisionWithPoints(SDL_Rect a, SDL_Rect b, int vel_x, int vel_y) {
+std::pair<int, int> CheckCollisionWithPoints(SDL_Rect a, SDL_Rect b, int vel_x, int vel_y) {
   SDL_Rect result_rect;
   int result_x = a.x;
   int result_y = a.y;
@@ -42,44 +42,39 @@ std::pair<int, int> checkCollisionWithPoints(SDL_Rect a, SDL_Rect b, int vel_x, 
 }
 
 // TODO(jgillis): Make this check only x or y
-bool checkCollision(SDL_Rect a, SDL_Rect b)
-{
+bool CheckCollision(SDL_Rect a, SDL_Rect b) {
   //The sides of the rectangles
-  int leftA, leftB;
-  int rightA, rightB;
-  int topA, topB;
-  int bottomA, bottomB;
+  int left_a, left_b;
+  int right_a, right_b;
+  int top_a, top_b;
+  int bottom_a, bottom_b;
 
   //Calculate the sides of rect A
-  leftA = a.x;
-  rightA = a.x + a.w;
-  topA = a.y;
-  bottomA = a.y + a.h;
+  left_a = a.x;
+  right_a = a.x + a.w;
+  top_a = a.y;
+  bottom_a = a.y + a.h;
 
   //Calculate the sides of rect B
-  leftB = b.x;
-  rightB = b.x + b.w;
-  topB = b.y;
-  bottomB = b.y + b.h;
+  left_b = b.x;
+  right_b = b.x + b.w;
+  top_b = b.y;
+  bottom_b = b.y + b.h;
 
   //If any of the sides from A are outside of B
-  if( bottomA <= topB )
-  {
+  if(bottom_a <= top_b) {
       return false;
   }
 
-  if( topA >= bottomB )
-  {
+  if(top_a >= bottom_b) {
       return false;
   }
 
-  if( rightA <= leftB )
-  {
+  if( right_a <= left_b ) {
       return false;
   }
 
-  if( leftA >= rightB )
-  {
+  if(left_a >= right_b) {
       return false;
   }
 
@@ -87,64 +82,64 @@ bool checkCollision(SDL_Rect a, SDL_Rect b)
   return true;
 }
 
-int checkCollisionX(SDL_Rect a, SDL_Rect b) {
+int CheckCollisionX(SDL_Rect a, SDL_Rect b) {
   //The sides of the rectangles
-  int leftA, leftB;
-  int rightA, rightB;
-  int topA, topB;
-  int bottomA, bottomB;
+  int left_a, left_b;
+  int right_a, right_b;
+  int top_a, top_b;
+  int bottom_a, bottom_b;
 
   //Calculate the sides of rect A
-  leftA = a.x;
-  rightA = a.x + a.w;
-  topA = a.y;
-  bottomA = a.y + a.h;
+  left_a = a.x;
+  right_a = a.x + a.w;
+  top_a = a.y;
+  bottom_a = a.y + a.h;
 
   //Calculate the sides of rect B
-  leftB = b.x;
-  rightB = b.x + b.w;
-  topB = b.y;
-  bottomB = b.y + b.h;
+  left_b = b.x;
+  right_b = b.x + b.w;
+  top_b = b.y;
+  bottom_b = b.y + b.h;
 
   // A touches the left side of B
-  if ((rightA >= leftB) && (rightA <= rightB)) {
+  if ((right_a >= left_b) && (right_a <= right_b)) {
     return -1;
   }
 
   // A touches the right side of B
-  if ((leftA <= rightB) && (rightA >= rightB)) {
+  if ((left_a <= right_b) && (right_a >= right_b)) {
     return 1;
   }
 
   return 0;
 }
 
-int checkCollisionY(SDL_Rect a, SDL_Rect b) {
+int CheckCollisionY(SDL_Rect a, SDL_Rect b) {
   //The sides of the rectangles
-  int leftA, leftB;
-  int rightA, rightB;
-  int topA, topB;
-  int bottomA, bottomB;
+  int left_a, left_b;
+  int right_a, right_b;
+  int top_a, top_b;
+  int bottom_a, bottom_b;
 
   //Calculate the sides of rect A
-  leftA = a.x;
-  rightA = a.x + a.w;
-  topA = a.y;
-  bottomA = a.y + a.h;
+  left_a = a.x;
+  right_a = a.x + a.w;
+  top_a = a.y;
+  bottom_a = a.y + a.h;
 
   //Calculate the sides of rect B
-  leftB = b.x;
-  rightB = b.x + b.w;
-  topB = b.y;
-  bottomB = b.y + b.h;
+  left_b = b.x;
+  right_b = b.x + b.w;
+  top_b = b.y;
+  bottom_b = b.y + b.h;
 
   // A touches the top side of B
-  if ((bottomA >= topB) && (bottomA <= bottomB)) {
+  if ((bottom_a >= top_b) && (bottom_a <= bottom_b)) {
     return -1;
   }
 
   // A touches the bottom side of B
-  if ((topA <= bottomB) && (topA >= bottomB)) {
+  if ((top_a <= bottom_b) && (top_a >= bottom_b)) {
     return 1;
   }
 

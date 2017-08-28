@@ -8,110 +8,100 @@
 #include <stdio.h>
 #include <string>
 
-Ball::Ball()
-{
+Ball::Ball() {
   //Initialize the offsets
-  posX_ = 0;
-  posY_ = 0;
+  x_pos_ = 0;
+  y_pos_ = 0;
 
   //Set collision box dimension
-  collider_.w = DOT_WIDTH;
-  collider_.h = DOT_HEIGHT;
+  collider_.w = BALL_WIDTH;
+  collider_.h = BALL_HEIGHT;
 
   //Initialize the velocity
-  velX_ = 0;
-  velY_ = 0;
+  x_vel_ = 0;
+  y_vel_ = 0;
 }
 
-void Ball::handleEvent(SDL_Event& e)
-{
+void Ball::HandleEvent(SDL_Event& e) {
   //If a key was pressed
-  if (e.type == SDL_KEYDOWN && e.key.repeat == 0)
-  {
+  if (e.type == SDL_KEYDOWN && e.key.repeat == 0) {
     //Adjust the velocity
-    switch (e.key.keysym.sym)
-    {
+    switch (e.key.keysym.sym) {
     case SDLK_UP:
-      velY_ -= DOT_VEL;
+      y_vel_ -= BALL_VEL;
       break;
     case SDLK_DOWN:
-      velY_ += DOT_VEL;
+      y_vel_ += BALL_VEL;
       break;
     case SDLK_LEFT:
-      velX_ -= DOT_VEL;
+      x_vel_ -= BALL_VEL;
       break;
     case SDLK_RIGHT:
-      velX_ += DOT_VEL;
+      x_vel_ += BALL_VEL;
       break;
     }
-  }
-  //If a key was released
-  else if (e.type == SDL_KEYUP && e.key.repeat == 0)
-  {
+  } else if (e.type == SDL_KEYUP && e.key.repeat == 0) {
+    //If a key was released
     //Adjust the velocity
-    switch (e.key.keysym.sym)
-    {
+    switch (e.key.keysym.sym) {
     case SDLK_UP:
-      velY_ += DOT_VEL;
+      y_vel_ += BALL_VEL;
       break;
     case SDLK_DOWN:
-      velY_ -= DOT_VEL;
+      y_vel_ -= BALL_VEL;
       break;
     case SDLK_LEFT:
-      velX_ += DOT_VEL;
+      x_vel_ += BALL_VEL;
       break;
     case SDLK_RIGHT:
-      velX_ -= DOT_VEL;
+      x_vel_ -= BALL_VEL;
       break;
     }
   }
 }
 
-void Ball::move(double deltaTime, std::vector<SDL_Rect>& colliders)
+void Ball::Move(double delta_time, std::vector<SDL_Rect>& colliders)
 {
   //Move the dot left or right
   // Perfect delta is 16.6666...
-  int delta_vel_x = double(velX_ / 16.667) * deltaTime;
-  posX_ += delta_vel_x;
-  collider_.x = posX_;
+  int delta_vel_x = double(x_vel_ / 16.667) * delta_time;
+  x_pos_ += delta_vel_x;
+  collider_.x = x_pos_;
 
   // TODO: score on going to the ends of the X screen
 
   //If the dot collided or went too far to the left or right
-  if ((posX_ < 0) || (posX_ + DOT_WIDTH > constants::SCREEN_WIDTH))
-  {
+  if ((x_pos_ < 0) || (x_pos_ + BALL_WIDTH > constants::SCREEN_WIDTH)) {
     //Move back
-    posX_ -= delta_vel_x;
-    collider_.x = posX_;
+    x_pos_ -= delta_vel_x;
+    collider_.x = x_pos_;
   }
 
   //Move the dot up or down
-  int delta_vel_y = double(velY_ / 16.667) * deltaTime;
-  posY_ += delta_vel_y;
-  collider_.y = posY_;
+  int delta_vel_y = double(y_vel_ / 16.667) * delta_time;
+  y_pos_ += delta_vel_y;
+  collider_.y = y_pos_;
 
   //If the dot collided or went too far up or down
-  if ((posY_ < 0) || (posY_ + DOT_HEIGHT > constants::SCREEN_HEIGHT))
-  {
+  if ((y_pos_ < 0) || (y_pos_ + BALL_HEIGHT > constants::SCREEN_HEIGHT)) {
     //Move back
-    posY_ -= delta_vel_y;
-    collider_.y = posY_;
+    y_pos_ -= delta_vel_y;
+    collider_.y = y_pos_;
   }
 
   for (auto& outside_collider : colliders) {
-    std::pair<int, int> fixed_points = checkCollisionWithPoints(collider_, outside_collider, delta_vel_x, delta_vel_y);
-    posX_ = fixed_points.first;
-    posY_ = fixed_points.second;
-    collider_.x = posX_;
-    collider_.y = posY_;
-    printf("Moved ball to x: %d, y: %d\n", posX_, posY_); 
+    std::pair<int, int> fixed_points = CheckCollisionWithPoints(collider_, outside_collider, delta_vel_x, delta_vel_y);
+    x_pos_ = fixed_points.first;
+    y_pos_ = fixed_points.second;
+    collider_.x = x_pos_;
+    collider_.y = y_pos_;
+    printf("Moved ball to x: %d, y: %d\n", x_pos_, y_pos_); 
   }
 
-  printf("x: %d, y: %d, \ncollider x: %d, collider y: %d", posX_, posY_, collider_.x, collider_.y);
+  printf("x: %d, y: %d, \ncollider x: %d, collider y: %d", x_pos_, y_pos_, collider_.x, collider_.y);
 }
 
-void Ball::render(Texture* texture)
-{
+void Ball::Render(Texture* texture) {
   //Show the dot
-  texture->render(posX_, posY_);
+  texture->Render(x_pos_, y_pos_);
 }
