@@ -1,6 +1,45 @@
 #include "collision.h"
 
+#include <utility>
+
 #include <SDL2/SDL.h>
+
+// Returns the point at which A needs to be moved to to avoid collision.
+std::pair<int, int> checkCollisionWithPoints(SDL_Rect a, SDL_Rect b, int vel_x, int vel_y) {
+  SDL_Rect result_rect;
+  int result_x = a.x;
+  int result_y = a.y;
+
+  if (SDL_IntersectRect(&a, &b, &result_rect) == SDL_FALSE) {
+    return {result_x, result_y};
+  }
+
+  printf("Intersection rect - x: %d, y: %d, w: %d, h: %d\n", result_rect.x,
+    result_rect.y, result_rect.w, result_rect.h);
+
+  // use the smallest intersection delta
+  // horizontal collision
+  if (result_rect.w < result_rect.h) {
+    // if positive velocity, a hit the left side of b
+    if (vel_x >= 0) {
+      result_x = b.x - a.w;
+    } else {
+      // if negative velocity, a hit the right side of b
+      result_x = b.x + b.w;
+    }
+  // vertical collision
+  } else {
+    // if positive velocity, a hit the top side of b
+    if (vel_y >= 0) {
+      result_y = b.y - a.h;
+    } else {
+      // if negative velocity, a hit the bottom side of b
+      result_y = b.y + b.h;
+    }
+  }
+
+  return {result_x, result_y};
+}
 
 // TODO(jgillis): Make this check only x or y
 bool checkCollision(SDL_Rect a, SDL_Rect b)
