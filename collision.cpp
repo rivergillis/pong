@@ -16,7 +16,28 @@ std::pair<int, int> CheckCollisionWithPoints(SDL_Rect a, SDL_Rect b, int vel_x, 
 
   printf("Intersection rect - x: %d, y: %d, w: %d, h: %d\n", result_rect.x,
     result_rect.y, result_rect.w, result_rect.h);
+
+  // move back horizontally if moving faster and horizontal pen
+  if ((abs(vel_x) >= abs(vel_y)) && (result_rect.w > 0)) {
+    // moving right
+    if (vel_x > 0) {
+      result_x = b.x - a.w;
+    } else {
+      // moving left
+      result_x = b.x + b.w;
+    }
+  } else {
+    // otherwise move back vertically
+    // moving down
+    if (vel_y > 0) {
+      result_y = b.y - a.h;
+    } else {
+      // moving up
+      result_y = b.y + b.h;
+    }
+  }
   
+  /*
   // pentrated deeper vertically
   if (result_rect.w <= result_rect.h) {
     // moving upward
@@ -34,7 +55,8 @@ std::pair<int, int> CheckCollisionWithPoints(SDL_Rect a, SDL_Rect b, int vel_x, 
       // moving rightward
       result_x -= result_rect.w;
     }
-  }
+  } */
+
   /*
   // if there is a horizontal intersection
   if (result_rect.w > 0) {
@@ -58,8 +80,7 @@ std::pair<int, int> CheckCollisionWithPoints(SDL_Rect a, SDL_Rect b, int vel_x, 
       // if we're coming from the bottom, move to bottom of collider
       result_y = b.y + b.h;
     }
-  }
-  */
+  }*/
 
   /*
   // use the smallest intersection delta
