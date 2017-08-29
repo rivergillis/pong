@@ -2,6 +2,7 @@
 #define PADDLE_H_
 
 #include <SDL2/SDL.h>
+#include "texture.h"
 
 class Paddle {
  public:
@@ -13,8 +14,28 @@ class Paddle {
   static const int PADDLE_VEL = 10;
 
   Paddle();
+
+  void HandleEvent(SDL_Event& e);
+
+  //Moves the paddle and checks collision
+  // NOTE: Paddle doesn't check collision, so we need to move all
+  // of the paddles BEFORE we move the ball!
+  void Move(double delta_time);
+  
+  //Shows the ball on the screen
+  void Render(Texture* texture);
+
+  SDL_Rect* GetCollider() { return &collider_; }
   
  private:
+  //The X and Y offsets of the paddle
+  int x_pos_, y_pos_;
+  
+  //The velocity of the paddle, vert only
+  int y_vel_;
+
+  //Paddle's collision box
+  SDL_Rect collider_;
 };
 
 #endif
