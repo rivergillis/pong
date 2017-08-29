@@ -20,8 +20,8 @@ Ball::Ball() : rng_((std::random_device())()) {
 
   // TODO: move this to an Init() method
 
-  // up to 40% of ball's initial velocity can be vertical
-  std::uniform_int_distribution<int> uni(1, BALL_VEL / 4);
+  // up to 30% of ball's initial velocity can be vertical
+  std::uniform_int_distribution<int> uni(1, BALL_VEL / 3);
   y_vel_ = uni(rng_);
 
   // rest goes to horizontal velocity
