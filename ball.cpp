@@ -11,8 +11,8 @@
 
 Ball::Ball() : rng_((std::random_device())()) {
   //Initialize the offsets
-  x_pos_ = 0;
-  y_pos_ = 0;
+  x_pos_ = (constants::SCREEN_WIDTH - BALL_WIDTH) / 2;
+  y_pos_ = (constants::SCREEN_HEIGHT - BALL_HEIGHT) / 2;;
 
   //Set collision box dimension
   collider_.w = BALL_WIDTH;
@@ -20,8 +20,8 @@ Ball::Ball() : rng_((std::random_device())()) {
 
   // TODO: move this to an Init() method
 
-  // up to 30% of ball's initial velocity can be vertical
-  std::uniform_int_distribution<int> uni(0, BALL_VEL / 3);
+  // up to 40% of ball's initial velocity can be vertical
+  std::uniform_int_distribution<int> uni(1, BALL_VEL / 4);
   y_vel_ = uni(rng_);
 
   // rest goes to horizontal velocity
@@ -58,6 +58,7 @@ void Ball::Move(double delta_time, std::vector<SDL_Rect>& colliders) {
     //Move back
     x_pos_ -= delta_vel_x;
     collider_.x = x_pos_;
+    x_vel_ *= -1;
   }
 
   //Move the dot up or down
@@ -70,6 +71,7 @@ void Ball::Move(double delta_time, std::vector<SDL_Rect>& colliders) {
     //Move back
     y_pos_ -= delta_vel_y;
     collider_.y = y_pos_;
+    y_vel_ *= -1;
   }
 
   for (auto& outside_collider : colliders) {
@@ -78,6 +80,13 @@ void Ball::Move(double delta_time, std::vector<SDL_Rect>& colliders) {
     if (x_pos_ == fixed_points.first && y_pos_ == fixed_points.second) {
       continue;
     }
+
+    if (fixed_points.first != x_pos_) {
+      x_vel_ *= -1;
+    } else {
+      y_vel_ *= -1;
+    }
+
     x_pos_ = fixed_points.first;
     y_pos_ = fixed_points.second;
     collider_.x = x_pos_;

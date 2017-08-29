@@ -110,7 +110,7 @@ void GameLoop(TexturePack* textures) {
 
   //Set the wall
   SDL_Rect wall;
-  wall.x = 300;
+  wall.x = 0;
   wall.y = 40;
   wall.w = 40;
   wall.h = 400;
