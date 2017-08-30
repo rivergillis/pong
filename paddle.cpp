@@ -37,7 +37,7 @@ void Paddle::HandleEvent(SDL_Event& e) {
 }
 
 void Paddle::Move(double delta_time) {
-  int delta_vel_y = double(y_vel_ / 16.667) * delta_time;
+  int delta_vel_y = double(y_vel_ / (1000.0 / 60)) * delta_time;
   y_pos_ += delta_vel_y;
 
   if (y_pos_ < 0) {
@@ -52,9 +52,9 @@ void Paddle::Move(double delta_time) {
 void Paddle::Autopilot(SDL_Rect* ball) {
   // move towards the ball
   if (ball->y > y_pos_) {
-    y_vel_ = PADDLE_VEL * 0.4;
+    y_vel_ = PADDLE_VEL * 0.35;
   } else if (ball->y < y_pos_) {
-    y_vel_ = PADDLE_VEL * -0.4;
+    y_vel_ = PADDLE_VEL * -0.35;
   } else {
     y_vel_ = 0;
   }
