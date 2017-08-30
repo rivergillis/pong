@@ -17,7 +17,7 @@ class Paddle {
 
   void HandleEvent(SDL_Event& e);
 
-  //Moves the paddle and checks collision
+  //Moves the paddle
   // NOTE: Paddle doesn't check collision, so we need to move all
   // of the paddles BEFORE we move the ball!
   void Move(double delta_time);

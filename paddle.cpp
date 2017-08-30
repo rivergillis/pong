@@ -29,6 +29,19 @@ void Paddle::HandleEvent(SDL_Event& e) {
   }
 }
 
+void Paddle::Move(double delta_time) {
+  int delta_vel_y = double(y_vel_ / 16.667) * delta_time;
+  y_pos_ += delta_vel_y;
+
+  if (y_pos_ < 0) {
+    y_pos_ = 0;
+  } else if (y_pos_ + PADDLE_HEIGHT > constants::SCREEN_HEIGHT) {
+    y_pos_ = constants::SCREEN_HEIGHT - PADDLE_HEIGHT;
+  }
+
+  collider_.y = y_pos_;  
+}
+
 void Paddle::Render(Texture* texture) {
   texture->Render(x_pos_, y_pos_);
 }

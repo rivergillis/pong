@@ -18,4 +18,4 @@ paddle: paddle.cpp paddle.h
 	g++ -Wall -lSDL2 -lSDL2_image -lSDL2_ttf paddle.cpp -c -std=c++14
 
 clean:
-	rm texture.o ball.o texture_pack.o collision.o game
+	rm texture.o ball.o texture_pack.o collision.o paddle.o game

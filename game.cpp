@@ -3,6 +3,7 @@
 #include "texture.h"
 #include "texture_pack.h"
 #include "ball.h"
+#include "paddle.h"
 #include "constants.h"
 #include "collision.h"
 #include <SDL2/SDL.h>
@@ -115,6 +116,8 @@ void GameLoop(TexturePack* textures) {
   wall.w = 40;
   wall.h = 400;
 
+  Paddle player;
+
   std::vector<SDL_Rect> ball_colliders;
 
   ball_colliders.push_back(wall);
@@ -135,8 +138,12 @@ void GameLoop(TexturePack* textures) {
       if(e.type == SDL_QUIT) {
         quit = true;
       }
+
+      player.HandleEvent(e);
     }
 
+    // Paddles must move before ball!
+    player.Move(delta_time);
     ball.Move(delta_time, ball_colliders);
 
     //Clear screen
@@ -149,6 +156,9 @@ void GameLoop(TexturePack* textures) {
     //Render wall
     SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);		
     SDL_RenderDrawRect(renderer, &wall);
+    
+    // Render paddles
+    player.Render(textures->GetTexture(TextureName::PADDLE));
     
     //Render dot
     ball.Render(textures->GetTexture(TextureName::BALL));
