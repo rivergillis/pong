@@ -113,12 +113,14 @@ void GameLoop(TexturePack* textures) {
 
   Ball ball;
 
-  Paddle player;
+  Paddle player(true);
+  Paddle ai(false);
 
   std::vector<SDL_Rect*> ball_colliders;
 
   // ball_colliders.push_back(&wall);
   ball_colliders.push_back(player.GetCollider());
+  ball_colliders.push_back(ai.GetCollider());
 
   Uint64 time_now = SDL_GetPerformanceCounter();
   Uint64 time_last = 0;
@@ -140,7 +142,10 @@ void GameLoop(TexturePack* textures) {
       player.HandleEvent(e);
     }
 
+    ai.Autopilot(ball.GetCollider());
+
     // Paddles must move before ball!
+    ai.Move(delta_time);
     player.Move(delta_time);
     ball.Move(delta_time, ball_colliders);
 
@@ -152,6 +157,7 @@ void GameLoop(TexturePack* textures) {
     textures->GetTexture(TextureName::BG)->Render(0, 0);
     
     // Render paddles
+    ai.Render(textures->GetTexture(TextureName::PADDLE));
     player.Render(textures->GetTexture(TextureName::PADDLE));
 
     //Render dot

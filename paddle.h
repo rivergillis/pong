@@ -13,7 +13,8 @@ class Paddle {
   // The maximum vertical velocity of the paddle
   static const int PADDLE_VEL = 10;
 
-  Paddle();
+  // if player=true, set to left side
+  Paddle(bool player);
 
   void HandleEvent(SDL_Event& e);
 
@@ -24,6 +25,8 @@ class Paddle {
   
   //Shows the ball on the screen
   void Render(Texture* texture);
+
+  void Autopilot(SDL_Rect* ball);
 
   SDL_Rect* GetCollider() { return &collider_; }
   

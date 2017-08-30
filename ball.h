@@ -25,6 +25,8 @@ class Ball {
   //Initializes the variables
   Ball();
 
+  SDL_Rect* GetCollider() { return &collider_; }
+
   //Moves the ball and checks collision
   void Move(double delta_time, std::vector<SDL_Rect*>& colliders);
 

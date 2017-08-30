@@ -2,9 +2,14 @@
 
 #include "constants.h"
 
-Paddle::Paddle() {
+Paddle::Paddle(bool player) {
   // Set initial position
-  x_pos_ = 0;
+  if (player) {
+    x_pos_ = 0;    
+  } else {
+    x_pos_ = constants::SCREEN_WIDTH - PADDLE_WIDTH;
+  }
+
   y_pos_ = (constants::SCREEN_HEIGHT - PADDLE_HEIGHT) / 2;
 
   collider_.x = x_pos_;
@@ -42,6 +47,11 @@ void Paddle::Move(double delta_time) {
   }
 
   collider_.y = y_pos_;  
+}
+
+void Paddle::Autopilot(SDL_Rect* ball) {
+  // move towards the ball
+  
 }
 
 void Paddle::Render(Texture* texture) {
