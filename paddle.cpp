@@ -51,7 +51,13 @@ void Paddle::Move(double delta_time) {
 
 void Paddle::Autopilot(SDL_Rect* ball) {
   // move towards the ball
-  
+  if (ball->y > y_pos_) {
+    y_vel_ = PADDLE_VEL * 0.4;
+  } else if (ball->y < y_pos_) {
+    y_vel_ = PADDLE_VEL * -0.4;
+  } else {
+    y_vel_ = 0;
+  }
 }
 
 void Paddle::Render(Texture* texture) {
