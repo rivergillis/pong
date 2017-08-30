@@ -26,7 +26,7 @@ class Ball {
   Ball();
 
   //Moves the ball and checks collision
-  void Move(double delta_time, std::vector<SDL_Rect>& colliders);
+  void Move(double delta_time, std::vector<SDL_Rect*>& colliders);
 
   //Shows the ball on the screen
   void Render(Texture* texture);

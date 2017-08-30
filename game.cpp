@@ -102,6 +102,10 @@ void Close(TexturePack* textures)
   SDL_Quit();
 }
 
+void PrintRect(SDL_Rect* rect) {
+  printf("Rect - x: %d, y: %d, w: %d, h: %d\n", rect->x, rect->y, rect->w, rect->h);
+}
+
 void GameLoop(TexturePack* textures) {
   bool quit = false;
 
@@ -109,18 +113,12 @@ void GameLoop(TexturePack* textures) {
 
   Ball ball;
 
-  //Set the wall
-  SDL_Rect wall;
-  wall.x = 0;
-  wall.y = 40;
-  wall.w = 40;
-  wall.h = 400;
-
   Paddle player;
 
-  std::vector<SDL_Rect> ball_colliders;
+  std::vector<SDL_Rect*> ball_colliders;
 
-  ball_colliders.push_back(wall);
+  // ball_colliders.push_back(&wall);
+  ball_colliders.push_back(player.GetCollider());
 
   Uint64 time_now = SDL_GetPerformanceCounter();
   Uint64 time_last = 0;
@@ -152,14 +150,10 @@ void GameLoop(TexturePack* textures) {
 
     //Render bg
     textures->GetTexture(TextureName::BG)->Render(0, 0);
-
-    //Render wall
-    SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);		
-    SDL_RenderDrawRect(renderer, &wall);
     
     // Render paddles
     player.Render(textures->GetTexture(TextureName::PADDLE));
-    
+
     //Render dot
     ball.Render(textures->GetTexture(TextureName::BALL));
 

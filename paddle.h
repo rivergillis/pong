@@ -7,8 +7,8 @@
 class Paddle {
  public:
   // The dimensions of the paddle
-  static const int PADDLE_WIDTH = 30;
-  static const int PADDLE_HEIGHT = 100;
+  static const int PADDLE_WIDTH = 50;
+  static const int PADDLE_HEIGHT = 120;
 
   // The maximum vertical velocity of the paddle
   static const int PADDLE_VEL = 10;

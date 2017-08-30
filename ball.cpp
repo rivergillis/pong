@@ -44,7 +44,7 @@ Ball::Ball() : rng_((std::random_device())()) {
   printf("init ball with xvel: %d, yvel: %d\n", x_vel_, y_vel_);
 }
 
-void Ball::Move(double delta_time, std::vector<SDL_Rect>& colliders) {
+void Ball::Move(double delta_time, std::vector<SDL_Rect*>& colliders) {
   //Move the dot left or right
   // Perfect delta is 16.6666...
   int delta_vel_x = double(x_vel_ / 16.667) * delta_time;
@@ -75,7 +75,7 @@ void Ball::Move(double delta_time, std::vector<SDL_Rect>& colliders) {
   }
 
   for (auto& outside_collider : colliders) {
-    std::pair<int, int> fixed_points = CheckCollisionWithPoints(collider_, outside_collider, delta_vel_x, delta_vel_y);
+    std::pair<int, int> fixed_points = CheckCollisionWithPoints(collider_, *outside_collider, delta_vel_x, delta_vel_y);
     // no collision
     if (x_pos_ == fixed_points.first && y_pos_ == fixed_points.second) {
       continue;

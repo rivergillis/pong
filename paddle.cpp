@@ -7,6 +7,8 @@ Paddle::Paddle() {
   x_pos_ = 0;
   y_pos_ = (constants::SCREEN_HEIGHT - PADDLE_HEIGHT) / 2;
 
+  collider_.x = x_pos_;
+  collider_.y = y_pos_;
   collider_.w = PADDLE_WIDTH;
   collider_.h = PADDLE_HEIGHT;
 
