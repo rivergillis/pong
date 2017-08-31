@@ -25,6 +25,7 @@ TTF_Font* score_font = NULL;
 Texture score_font_texture;
 
 Mix_Chunk* bop = NULL;
+Mix_Chunk* boop = NULL;
 
 bool Init(TexturePack* textures) {
   //Initialization flag
@@ -113,6 +114,12 @@ bool LoadMedia(TexturePack* textures)
   if( bop == NULL ) {
 		printf( "Failed to load bop sound effect! SDL_mixer Error: %s\n", Mix_GetError() );
 		success = false;
+  }
+  
+  boop = Mix_LoadWAV("assets/sfx/blip-fs4.wav");
+  if( boop == NULL ) {
+		printf( "Failed to load boop sound effect! SDL_mixer Error: %s\n", Mix_GetError() );
+		success = false;
 	}
 
   return success;
@@ -137,6 +144,9 @@ void Close(TexturePack* textures)
 
   Mix_FreeChunk(bop);
   bop = NULL;
+
+  Mix_FreeChunk(boop);
+  boop = NULL;
 
   //Quit SDL subsystems
   Mix_Quit();
@@ -234,6 +244,10 @@ void GameLoop(TexturePack* textures) {
       case CollisionType::PADDLE:
         Mix_PlayChannel( -1, bop, 0 );
         break; 
+      case CollisionType::SCORE:
+        Mix_PlayChannel(-1, boop, 0);
+        break;
+      default: break;
     }
 
     //Update screen
