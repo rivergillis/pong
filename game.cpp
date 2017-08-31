@@ -11,12 +11,17 @@
 #include <SDL2/SDL_ttf.h>
 #include <stdio.h>
 #include <string>
+#include <sstream>
 
 //The window we'll be rendering to
 SDL_Window* window = NULL;
 
 //The window renderer
 SDL_Renderer* renderer = NULL;
+
+TTF_Font* score_font = NULL;
+
+Texture score_font_texture;
 
 bool Init(TexturePack* textures) {
   //Initialization flag
@@ -53,8 +58,22 @@ bool Init(TexturePack* textures) {
           printf("SDL_image could not initialize! SDL_image Error: %s\n", IMG_GetError());
           success = false;
         }
+
+         //Initialize SDL_ttf
+				if( TTF_Init() == -1 )
+				{
+					printf( "SDL_ttf could not initialize! SDL_ttf Error: %s\n", TTF_GetError() );
+					success = false;
+				}
       }
     }
+  }
+
+  score_font = TTF_OpenFont("assets/fonts/fff-forward.ttf", 42);
+  if (score_font == NULL) {
+    printf("Error: Failed to open font fff-forward.ttf! Error: %s\n", TTF_GetError());
+  } else {
+    score_font_texture.Init(renderer, score_font);
   }
 
   //TODO: Refactor above
@@ -128,6 +147,9 @@ void GameLoop(TexturePack* textures) {
   Uint64 time_last = 0;
   double delta_time = 0;
 
+  SDL_Color textColor = { 255, 255, 255, 255 };
+  score_font_texture.LoadFromRenderedText("0  0", textColor);  
+
   while (!quit) {
     time_last = time_now;
     time_now = SDL_GetPerformanceCounter();
@@ -154,6 +176,12 @@ void GameLoop(TexturePack* textures) {
     player.Move(delta_time);
     ball.Move(delta_time, ball_colliders, &player_score, &ai_score);
 
+    if (player_score != old_player_score || ai_score != old_ai_score) {
+      std::ostringstream ss;
+      ss << player_score << "  " << ai_score;
+      score_font_texture.LoadFromRenderedText(ss.str(), textColor);
+    }
+
     if (player_score != old_player_score) {
       printf("Player has scored! Player Score: %d\n", player_score);
     } else if (ai_score != old_ai_score) {
@@ -173,6 +201,9 @@ void GameLoop(TexturePack* textures) {
 
     //Render dot
     ball.Render(textures->GetTexture(TextureName::BALL));
+
+    // Render text
+    score_font_texture.Render((constants::SCREEN_WIDTH - score_font_texture.GetWidth()) / 2, 10);
 
     //Update screen
     SDL_RenderPresent(renderer);

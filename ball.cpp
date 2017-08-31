@@ -62,8 +62,6 @@ void Ball::Move(double delta_time, std::vector<SDL_Rect*>& colliders, int* playe
   x_pos_ += delta_vel_x;
   collider_.x = x_pos_;
 
-  // TODO: score on going to the ends of the X screen
-
   //If the ball went too far to the left, score for the AI
   if (x_pos_ < 0) {
     Score(false, player_score, ai_score);

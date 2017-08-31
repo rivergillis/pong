@@ -24,17 +24,16 @@ void TexturePack::InitTexture(TextureName name, SDL_Renderer* renderer, TTF_Font
   textures_[name].Init(renderer, font);
 }
 
-
 std::string TexturePack::TexturePath(TextureName name) {
   switch(name) {
     case TextureName::BG:
-      return "textures/bg.png";
+      return "assets/textures/bg.png";
       break;
     case TextureName::BALL:
-      return "textures/ball.png";
+      return "assets/textures/ball.png";
       break;
     case TextureName::PADDLE:
-      return "textures/paddle.png";
+      return "assets/textures/paddle.png";
       break;
     case TextureName::TOTAL_NUM_TEXTURES:
       printf("Tried to access texture for TOTAL_NUM_TEXTURES!\n");
