@@ -116,9 +116,11 @@ void GameLoop(TexturePack* textures) {
   Paddle player(true);
   Paddle ai(false);
 
+  int player_score = 0;
+  int ai_score = 0;
+
   std::vector<SDL_Rect*> ball_colliders;
 
-  // ball_colliders.push_back(&wall);
   ball_colliders.push_back(player.GetCollider());
   ball_colliders.push_back(ai.GetCollider());
 
@@ -144,10 +146,19 @@ void GameLoop(TexturePack* textures) {
 
     ai.Autopilot(ball.GetCollider());
 
+    int old_player_score = player_score;
+    int old_ai_score = ai_score;
+
     // Paddles must move before ball!
     ai.Move(delta_time);
     player.Move(delta_time);
-    ball.Move(delta_time, ball_colliders);
+    ball.Move(delta_time, ball_colliders, &player_score, &ai_score);
+
+    if (player_score != old_player_score) {
+      printf("Player has scored! Player Score: %d\n", player_score);
+    } else if (ai_score != old_ai_score) {
+      printf("AI has scored! AI Score: %d\n", ai_score);
+    }
 
     //Clear screen
     SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);

@@ -10,6 +10,10 @@
 #include <random>
 
 Ball::Ball() : rng_((std::random_device())()) {
+  ResetBall();
+}
+
+void Ball::ResetBall() {
   //Initialize the offsets
   x_pos_ = (constants::SCREEN_WIDTH - BALL_WIDTH) / 2;
   y_pos_ = (constants::SCREEN_HEIGHT - BALL_HEIGHT) / 2;;
@@ -17,8 +21,6 @@ Ball::Ball() : rng_((std::random_device())()) {
   //Set collision box dimension
   collider_.w = BALL_WIDTH;
   collider_.h = BALL_HEIGHT;
-
-  // TODO: move this to an Init() method
 
   // up to 30% of ball's initial velocity can be vertical
   std::uniform_int_distribution<int> uni(1, BALL_VEL / 3);
@@ -41,24 +43,35 @@ Ball::Ball() : rng_((std::random_device())()) {
     y_vel_ *= -1;
   }
 
-  printf("init ball with xvel: %d, yvel: %d\n", x_vel_, y_vel_);
+  printf("Reset ball with xvel: %d, yvel: %d\n", x_vel_, y_vel_);  
 }
 
-void Ball::Move(double delta_time, std::vector<SDL_Rect*>& colliders) {
+void Ball::Score(bool player_scored, int* player_score, int* ai_score) {
+  if (player_scored) {
+    *player_score += 1;
+  } else {
+    *ai_score += 1;
+  }
+  ResetBall();
+} 
+
+
+void Ball::Move(double delta_time, std::vector<SDL_Rect*>& colliders, int* player_score, int* ai_score) {
   //Move the dot left or right
-  // Perfect delta is 16.6666...
   int delta_vel_x = double(x_vel_ / (1000.0 / 60)) * delta_time;
   x_pos_ += delta_vel_x;
   collider_.x = x_pos_;
 
   // TODO: score on going to the ends of the X screen
 
-  //If the dot collided or went too far to the left or right
-  if ((x_pos_ < 0) || (x_pos_ + BALL_WIDTH > constants::SCREEN_WIDTH)) {
-    //Move back
-    x_pos_ -= delta_vel_x;
-    collider_.x = x_pos_;
-    x_vel_ *= -1;
+  //If the ball went too far to the left, score for the AI
+  if (x_pos_ < 0) {
+    Score(false, player_score, ai_score);
+    return;
+  } else if (x_pos_ + BALL_WIDTH > constants::SCREEN_WIDTH) {
+    // If the ball went too far to the right, score for the Player
+    Score(true, player_score, ai_score);
+    return;
   }
 
   //Move the dot up or down
