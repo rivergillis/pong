@@ -15,17 +15,17 @@
 #include <sstream>
 
 //The window we'll be rendering to
-SDL_Window* window = NULL;
+SDL_Window* window = nullptr;
 
 //The window renderer
-SDL_Renderer* renderer = NULL;
+SDL_Renderer* renderer = nullptr;
 
-TTF_Font* score_font = NULL;
+TTF_Font* score_font = nullptr;
 
 Texture score_font_texture;
 
-Mix_Chunk* bop = NULL;
-Mix_Chunk* boop = NULL;
+Mix_Chunk* bop = nullptr;
+Mix_Chunk* boop = nullptr;
 
 bool Init(TexturePack* textures) {
   //Initialization flag
@@ -34,60 +34,50 @@ bool Init(TexturePack* textures) {
   //Initialize SDL
   if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0) {
     printf("SDL could not initialize! SDL Error: %s\n", SDL_GetError());
-    success = false;
-  } else {
-    //Set texture filtering to linear
-    if (!SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1")) {
-      printf("Warning: Linear texture filtering not enabled!");
-    }
-
-    //Create window
-    window = SDL_CreateWindow("Pong", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, constants::SCREEN_WIDTH, constants::SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
-    if (window == NULL) {
-      printf("Window could not be created! SDL Error: %s\n", SDL_GetError());
-      success = false;
-    } else {
-      //Create vsynced renderer for window
-      renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-      if (renderer == NULL) {
-        printf("Renderer could not be created! SDL Error: %s\n", SDL_GetError());
-        success = false;
-      } else {
-        //Initialize renderer color
-        SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
-
-        //Initialize PNG loading
-        int img_flags = IMG_INIT_PNG;
-        if (!(IMG_Init(img_flags) & img_flags)) {
-          printf("SDL_image could not initialize! SDL_image Error: %s\n", IMG_GetError());
-          success = false;
-        }
-
-         //Initialize SDL_ttf
-				if( TTF_Init() == -1 )
-				{
-					printf( "SDL_ttf could not initialize! SDL_ttf Error: %s\n", TTF_GetError() );
-					success = false;
-        }
-        
-        //Initialize SDL_mixer
-				if( Mix_OpenAudio( 44100, MIX_DEFAULT_FORMAT, 2, 2048 ) < 0 )
-				{
-					printf( "SDL_mixer could not initialize! SDL_mixer Error: %s\n", Mix_GetError() );
-					success = false;
-				}
-      }
-    }
+    return false;
   }
 
-  score_font = TTF_OpenFont("assets/fonts/fff-forward.ttf", 42);
-  if (score_font == NULL) {
-    printf("Error: Failed to open font fff-forward.ttf! Error: %s\n", TTF_GetError());
-  } else {
-    score_font_texture.Init(renderer, score_font);
+  //Set texture filtering to linear
+  if (!SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1")) {
+    printf("Warning: Linear texture filtering not enabled!");
   }
 
-  //TODO: Refactor above
+  //Create window
+  window = SDL_CreateWindow("Pong", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, constants::SCREEN_WIDTH, constants::SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+  if (window == nullptr) {
+    printf("Window could not be created! SDL Error: %s\n", SDL_GetError());
+    return false;
+  }
+
+  //Create vsynced renderer for window
+  renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+  if (renderer == nullptr) {
+    printf("Renderer could not be created! SDL Error: %s\n", SDL_GetError());
+    return false;
+  }
+
+  //Initialize renderer color
+  SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+
+  //Initialize PNG loading
+  int img_flags = IMG_INIT_PNG;
+  if (!(IMG_Init(img_flags) & img_flags)) {
+    printf("SDL_image could not initialize! SDL_image Error: %s\n", IMG_GetError());
+    return false;
+  }
+
+  //Initialize SDL_ttf
+  if(TTF_Init() == -1) {
+    printf("SDL_ttf could not initialize! SDL_ttf Error: %s\n", TTF_GetError());
+    return false;
+  }
+  
+  //Initialize SDL_mixer
+  if(Mix_OpenAudio( 44100, MIX_DEFAULT_FORMAT, 2, 2048 ) < 0) {
+    printf("SDL_mixer could not initialize! SDL_mixer Error: %s\n", Mix_GetError());
+    return false;
+  }
+
   //TODO: use seperate texture pack for fonts
   for (int i = 0; i < static_cast<int>(TextureName::TOTAL_NUM_TEXTURES); ++i) {
     textures->InitTexture(static_cast<TextureName>(i), renderer);
@@ -96,8 +86,7 @@ bool Init(TexturePack* textures) {
   return success;
 }
 
-bool LoadMedia(TexturePack* textures)
-{
+bool LoadMedia(TexturePack* textures) {
   //Loading success flag
   bool success = true;
 
@@ -111,22 +100,28 @@ bool LoadMedia(TexturePack* textures)
   }
 
   bop = Mix_LoadWAV("assets/sfx/blip-fs5.wav");
-  if( bop == NULL ) {
+  if(bop == nullptr) {
 		printf( "Failed to load bop sound effect! SDL_mixer Error: %s\n", Mix_GetError() );
 		success = false;
   }
   
   boop = Mix_LoadWAV("assets/sfx/blip-fs4.wav");
-  if( boop == NULL ) {
+  if(boop == nullptr) {
 		printf( "Failed to load boop sound effect! SDL_mixer Error: %s\n", Mix_GetError() );
 		success = false;
-	}
+  }
+  
+  score_font = TTF_OpenFont("assets/fonts/fff-forward.ttf", 42);
+  if (score_font == nullptr) {
+    printf("Error: Failed to open font fff-forward.ttf! Error: %s\n", TTF_GetError());
+  } else {
+    score_font_texture.Init(renderer, score_font);
+  }
 
   return success;
 }
 
-void Close(TexturePack* textures)
-{
+void Close(TexturePack* textures) {
   //Free loaded images
   for (int i = 0; i < static_cast<int>(TextureName::TOTAL_NUM_TEXTURES); ++i) {
     Texture* current = textures->GetTexture(static_cast<TextureName>(i));
@@ -134,19 +129,19 @@ void Close(TexturePack* textures)
   }
 
   TTF_CloseFont(score_font);
-  score_font = NULL;
+  score_font = nullptr;
 
   //Destroy window
   SDL_DestroyRenderer(renderer);
   SDL_DestroyWindow(window);
-  window = NULL;
-  renderer = NULL;
+  window = nullptr;
+  renderer = nullptr;
 
   Mix_FreeChunk(bop);
-  bop = NULL;
+  bop = nullptr;
 
   Mix_FreeChunk(boop);
-  boop = NULL;
+  boop = nullptr;
 
   //Quit SDL subsystems
   Mix_Quit();
