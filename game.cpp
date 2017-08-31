@@ -9,6 +9,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL_mixer.h>
 #include <stdio.h>
 #include <string>
 #include <sstream>
@@ -23,12 +24,14 @@ TTF_Font* score_font = NULL;
 
 Texture score_font_texture;
 
+Mix_Chunk* bop = NULL;
+
 bool Init(TexturePack* textures) {
   //Initialization flag
   bool success = true;
 
   //Initialize SDL
-  if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+  if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0) {
     printf("SDL could not initialize! SDL Error: %s\n", SDL_GetError());
     success = false;
   } else {
@@ -63,6 +66,13 @@ bool Init(TexturePack* textures) {
 				if( TTF_Init() == -1 )
 				{
 					printf( "SDL_ttf could not initialize! SDL_ttf Error: %s\n", TTF_GetError() );
+					success = false;
+        }
+        
+        //Initialize SDL_mixer
+				if( Mix_OpenAudio( 44100, MIX_DEFAULT_FORMAT, 2, 2048 ) < 0 )
+				{
+					printf( "SDL_mixer could not initialize! SDL_mixer Error: %s\n", Mix_GetError() );
 					success = false;
 				}
       }
@@ -99,6 +109,12 @@ bool LoadMedia(TexturePack* textures)
     }
   }
 
+  bop = Mix_LoadWAV("assets/sfx/blip-fs5.wav");
+  if( bop == NULL ) {
+		printf( "Failed to load bop sound effect! SDL_mixer Error: %s\n", Mix_GetError() );
+		success = false;
+	}
+
   return success;
 }
 
@@ -110,13 +126,21 @@ void Close(TexturePack* textures)
     current->Free();    
   }
 
+  TTF_CloseFont(score_font);
+  score_font = NULL;
+
   //Destroy window
   SDL_DestroyRenderer(renderer);
   SDL_DestroyWindow(window);
   window = NULL;
   renderer = NULL;
 
+  Mix_FreeChunk(bop);
+  bop = NULL;
+
   //Quit SDL subsystems
+  Mix_Quit();
+  TTF_Quit();
   IMG_Quit();
   SDL_Quit();
 }
@@ -174,7 +198,7 @@ void GameLoop(TexturePack* textures) {
     // Paddles must move before ball!
     ai.Move(delta_time);
     player.Move(delta_time);
-    ball.Move(delta_time, ball_colliders, &player_score, &ai_score);
+    bool collision = ball.Move(delta_time, ball_colliders, &player_score, &ai_score);
 
     if (player_score != old_player_score || ai_score != old_ai_score) {
       std::ostringstream ss;
@@ -204,6 +228,10 @@ void GameLoop(TexturePack* textures) {
 
     // Render text
     score_font_texture.Render((constants::SCREEN_WIDTH - score_font_texture.GetWidth()) / 2, 10);
+
+    if (collision) {
+      Mix_PlayChannel( -1, bop, 0 );      
+    }
 
     //Update screen
     SDL_RenderPresent(renderer);

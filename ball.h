@@ -28,7 +28,8 @@ class Ball {
   SDL_Rect* GetCollider() { return &collider_; }
 
   //Moves the ball and checks collision
-  void Move(double delta_time, std::vector<SDL_Rect*>& colliders, int* player_score, int* ai_score);
+  // returns whether or not a collision occurred
+  bool Move(double delta_time, std::vector<SDL_Rect*>& colliders, int* player_score, int* ai_score);
 
   //Shows the ball on the screen
   void Render(Texture* texture);

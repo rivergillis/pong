@@ -1,5 +1,5 @@
 game: game.cpp texture.cpp ball.cpp texture_pack.cpp paddle.cpp collision.cpp
-	g++ -Wall -lSDL2 -lSDL2_image -lSDL2_ttf game.cpp  texture_pack.cpp texture.cpp \
+	g++ -Wall -lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_mixer game.cpp  texture_pack.cpp texture.cpp \
 		ball.cpp collision.cpp paddle.cpp -std=c++14 -o game
 
 texture: texture.cpp texture.h
