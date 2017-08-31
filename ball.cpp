@@ -56,8 +56,8 @@ void Ball::Score(bool player_scored, int* player_score, int* ai_score) {
 } 
 
 
-bool Ball::Move(double delta_time, std::vector<SDL_Rect*>& colliders, int* player_score, int* ai_score) {
-  bool collision = false;
+CollisionType Ball::Move(double delta_time, std::vector<SDL_Rect*>& colliders, int* player_score, int* ai_score) {
+  CollisionType type = CollisionType::NONE;
 
   //Move the ball left or right
   int delta_vel_x = double(x_vel_ / (1000.0 / 60)) * delta_time;
@@ -67,11 +67,11 @@ bool Ball::Move(double delta_time, std::vector<SDL_Rect*>& colliders, int* playe
   //If the ball went too far to the left, score for the AI
   if (x_pos_ < 0) {
     Score(false, player_score, ai_score);
-    return false;
+    return CollisionType::SCORE;
   } else if (x_pos_ + BALL_WIDTH > constants::SCREEN_WIDTH) {
     // If the ball went too far to the right, score for the Player
     Score(true, player_score, ai_score);
-    return false;
+    return CollisionType::SCORE;
   }
 
   //Move the dot up or down
@@ -85,7 +85,7 @@ bool Ball::Move(double delta_time, std::vector<SDL_Rect*>& colliders, int* playe
     y_pos_ -= delta_vel_y;
     collider_.y = y_pos_;
     y_vel_ *= -1;
-    collision = true;
+    type = CollisionType::WALL;
   }
 
   for (auto& outside_collider : colliders) {
@@ -107,10 +107,10 @@ bool Ball::Move(double delta_time, std::vector<SDL_Rect*>& colliders, int* playe
     collider_.y = y_pos_;
     printf("Moved ball to x: %d, y: %d\n", x_pos_, y_pos_); 
 
-    collision = true;
+    type = CollisionType::PADDLE;
   }
 
-  return collision;
+  return type;
   // printf("x: %d, y: %d, \ncollider x: %d, collider y: %d", x_pos_, y_pos_, collider_.x, collider_.y);
 }
 

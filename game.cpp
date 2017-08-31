@@ -88,7 +88,7 @@ bool Init(TexturePack* textures) {
 
   //TODO: Refactor above
   //TODO: use seperate texture pack for fonts
-  for (int i = 0; i < TextureName::TOTAL_NUM_TEXTURES; ++i) {
+  for (int i = 0; i < static_cast<int>(TextureName::TOTAL_NUM_TEXTURES); ++i) {
     textures->InitTexture(static_cast<TextureName>(i), renderer);
   }
 
@@ -100,7 +100,7 @@ bool LoadMedia(TexturePack* textures)
   //Loading success flag
   bool success = true;
 
-  for (int i = 0; i < TextureName::TOTAL_NUM_TEXTURES; ++i) {
+  for (int i = 0; i < static_cast<int>(TextureName::TOTAL_NUM_TEXTURES); ++i) {
     Texture* current = textures->GetTexture(static_cast<TextureName>(i));
     std::string path = textures->TexturePath(static_cast<TextureName>(i));
     if (!current->LoadFromFile(path)) {
@@ -121,7 +121,7 @@ bool LoadMedia(TexturePack* textures)
 void Close(TexturePack* textures)
 {
   //Free loaded images
-  for (int i = 0; i < TextureName::TOTAL_NUM_TEXTURES; ++i) {
+  for (int i = 0; i < static_cast<int>(TextureName::TOTAL_NUM_TEXTURES); ++i) {
     Texture* current = textures->GetTexture(static_cast<TextureName>(i));
     current->Free();    
   }
@@ -198,7 +198,7 @@ void GameLoop(TexturePack* textures) {
     // Paddles must move before ball!
     ai.Move(delta_time);
     player.Move(delta_time);
-    bool collision = ball.Move(delta_time, ball_colliders, &player_score, &ai_score);
+    CollisionType collision = ball.Move(delta_time, ball_colliders, &player_score, &ai_score);
 
     if (player_score != old_player_score || ai_score != old_ai_score) {
       std::ostringstream ss;
@@ -229,8 +229,11 @@ void GameLoop(TexturePack* textures) {
     // Render text
     score_font_texture.Render((constants::SCREEN_WIDTH - score_font_texture.GetWidth()) / 2, 10);
 
-    if (collision) {
-      Mix_PlayChannel( -1, bop, 0 );      
+    switch (collision) {
+      case CollisionType::WALL:
+      case CollisionType::PADDLE:
+        Mix_PlayChannel( -1, bop, 0 );
+        break; 
     }
 
     //Update screen

@@ -11,6 +11,12 @@
 #include <string>
 #include <random>
 
+enum class CollisionType {
+  NONE = 0,
+  WALL,
+  PADDLE,
+  SCORE
+};
 
 //The ball that will move around on the screen
 class Ball {
@@ -29,7 +35,7 @@ class Ball {
 
   //Moves the ball and checks collision
   // returns whether or not a collision occurred
-  bool Move(double delta_time, std::vector<SDL_Rect*>& colliders, int* player_score, int* ai_score);
+  CollisionType Move(double delta_time, std::vector<SDL_Rect*>& colliders, int* player_score, int* ai_score);
 
   //Shows the ball on the screen
   void Render(Texture* texture);

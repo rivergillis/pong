@@ -5,7 +5,7 @@
 
 #include "texture.h"
 
-enum TextureName {
+enum class TextureName {
   BG = 0,
   BALL,
   PADDLE,
