@@ -176,8 +176,8 @@ void GameLoop(TexturePack* textures) {
   Uint64 time_last = 0;
   double delta_time = 0;
 
-  SDL_Color textColor = { 255, 255, 255, 255 };
-  score_font_texture.LoadFromRenderedText("0  0", textColor);  
+  SDL_Color text_color = { 255, 255, 255, 255 };
+  score_font_texture.LoadFromRenderedText("0  0", text_color);  
 
   while (!quit) {
     time_last = time_now;
@@ -208,7 +208,7 @@ void GameLoop(TexturePack* textures) {
     if (player_score != old_player_score || ai_score != old_ai_score) {
       std::ostringstream ss;
       ss << player_score << "  " << ai_score;
-      score_font_texture.LoadFromRenderedText(ss.str(), textColor);
+      score_font_texture.LoadFromRenderedText(ss.str(), text_color);
     }
 
     if (player_score != old_player_score) {

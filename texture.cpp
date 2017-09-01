@@ -37,7 +37,7 @@ void Texture::Init(SDL_Renderer* renderer, TTF_Font* font) {
   has_init_ = true;
 }
 
-bool Texture::LoadFromFile(std::string path) {
+bool Texture::LoadFromFile(const std::string& path) {
   if (!has_init_) {
     printf("Tried to load texture without first initializing!");
     return false;
@@ -77,7 +77,7 @@ bool Texture::LoadFromFile(std::string path) {
 }
 
 #ifdef _SDL_TTF_H
-bool Texture::LoadFromRenderedText(std::string texture_text, SDL_Color text_color) {
+bool Texture::LoadFromRenderedText(const std::string& texture_text, SDL_Color text_color) {
   if (!has_init_) {
     printf("Tried to load texture from text without first initializing!");
     return false;

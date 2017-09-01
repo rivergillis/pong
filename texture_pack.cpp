@@ -5,6 +5,7 @@
 #include "texture.h"
 
 TexturePack::TexturePack() {
+  textures_.reserve(static_cast<int>(TextureName::TOTAL_NUM_TEXTURES));
   for (int i = 0; i < static_cast<int>(TextureName::TOTAL_NUM_TEXTURES); ++i) {
     textures_.emplace_back();
   }
@@ -17,10 +18,12 @@ TexturePack::~TexturePack() {
 }
 
 Texture* TexturePack::GetTexture(TextureName name) {
+  if (name == TextureName::TOTAL_NUM_TEXTURES) { return nullptr; }
   return &textures_[static_cast<int>(name)];
 }
 
 void TexturePack::InitTexture(TextureName name, SDL_Renderer* renderer, TTF_Font* font) {
+  if (name == TextureName::TOTAL_NUM_TEXTURES) { return; }  
   textures_[static_cast<int>(name)].Init(renderer, font);
 }
 

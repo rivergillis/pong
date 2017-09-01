@@ -22,11 +22,11 @@ class Texture
 	void Init(SDL_Renderer* renderer, TTF_Font* font = nullptr);
 
 	//Loads image at specified path
-	bool LoadFromFile(std::string path);
+	bool LoadFromFile(const std::string& path);
 
 	#ifdef _SDL_TTF_H
 	//Creates image from font string
-	bool LoadFromRenderedText(std::string texture_text, SDL_Color text_color);
+	bool LoadFromRenderedText(const std::string& texture_text, SDL_Color text_color);
 	#endif
 
 	//Deallocates texture
