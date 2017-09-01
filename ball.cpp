@@ -105,7 +105,7 @@ CollisionType Ball::Move(double delta_time, std::vector<SDL_Rect*>& colliders, i
     y_pos_ = fixed_points.second;
     collider_.x = x_pos_;
     collider_.y = y_pos_;
-    printf("Moved ball to x: %d, y: %d\n", x_pos_, y_pos_); 
+    // printf("Moved ball to x: %d, y: %d\n", x_pos_, y_pos_); 
 
     type = CollisionType::PADDLE;
   }

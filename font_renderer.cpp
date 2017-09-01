@@ -69,6 +69,7 @@ void FontRenderer::RenderFont(SDL_Renderer* renderer, FontName name, int size,
 
   // If we don't have the font in this size yet, make one
   if (font_map->count(size) == 0) {
+    printf("Making and rendering this font for the first time!\n");
     TTF_Font* new_font = TTF_OpenFont(FontPath(name).c_str(), size);
     if (new_font == nullptr) {
       printf("Error: Failed to open font! Message: %s\n", TTF_GetError());
@@ -93,6 +94,7 @@ void FontRenderer::RenderFont(SDL_Renderer* renderer, FontName name, int size,
     font->texture.Render(x, y);
   } else {
     // This is a new rendering text or color, remake the texture
+    printf("Rendering this font for the first time!\n");
     font->texture.LoadFromRenderedText(text, text_color);
     font->texture.Render(x, y);
 

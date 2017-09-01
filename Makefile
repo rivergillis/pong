@@ -1,27 +1,36 @@
-game: game.cpp texture.cpp ball.cpp texture_pack.cpp paddle.cpp collision.cpp
-	g++ -Wall -lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_mixer game.cpp  texture_pack.cpp texture.cpp \
-		ball.cpp collision.cpp paddle.cpp font_renderer.cpp utilities.cpp -std=c++14 -o game
+CC = g++
+SDLLIBS = -lSDL2 -lSDL2_image -lSDL2_mixer -lSDL2_ttf
+RELEASE = -c -O3 
+DEBUG = -c -g -D_DEBUG
+CSTD = -std=c++14
+CFLAGS = -Wall $(RELEASE) $(CSTD)
 
-texture: texture.cpp texture.h
-	g++ -Wall -lSDL2 -lSDL2_image -lSDL2_ttf texture.cpp -c -std=c++14
+game: game.o texture_pack.o texture.o ball.o collision.o paddle.o font_renderer.o utilities.o
+	$(CC) $(SDLLIBS) game.o texture_pack.o texture.o ball.o collision.o paddle.o font_renderer.o utilities.o -o game
 
-ball: ball.cpp ball.h
-	g++ -Wall -lSDL2 -lSDL2_image -lSDL2_ttf ball.cpp -c -std=c++14
+game.o: game.cpp
+	$(CC) $(CFLAGS) game.cpp
 
-texture_pack: texture_pack.cpp texture_pack.h
-	g++ -Wall -lSDL2 -lSDL2_image -lSDL2_ttf texture_pack.cpp -c -std=c++14
+texture.o: texture.cpp texture.h
+	$(CC) $(CFLAGS) texture.cpp
 
-collision: collision.cpp collision.h
-	g++ -Wall -lSDL2 -lSDL2_image -lSDL2_ttf collision.cpp -c -std=c++14
+ball.o: ball.cpp ball.h
+	$(CC) $(CFLAGS) ball.cpp
 
-paddle: paddle.cpp paddle.h
-	g++ -Wall -lSDL2 -lSDL2_image -lSDL2_ttf paddle.cpp -c -std=c++14
+texture_pack.o: texture_pack.cpp texture_pack.h
+	$(CC) $(CFLAGS) texture_pack.cpp
 
-font_renderer: font_renderer.cpp font_renderer.h
-	g++ -Wall -lSDL2 -lSDL2_image -lSDL2_ttf font_renderer.cpp -c -std=c++14
+collision.o: collision.cpp collision.h
+	$(CC) $(CFLAGS) collision.cpp
 
-utilities: utilities.cpp utilities.h
-	g++ -Wall -lSDL2 -lSDL2_image -lSDL2_ttf utilities.cpp -c -std=c++14
+paddle.o: paddle.cpp paddle.h
+	$(CC) $(CFLAGS) paddle.cpp
+
+font_renderer.o: font_renderer.cpp font_renderer.h
+	$(CC) $(CFLAGS) font_renderer.cpp
+
+utilities.o: utilities.cpp utilities.h
+	$(CC) $(CFLAGS) utilities.cpp
 
 clean:
-	rm texture.o ball.o texture_pack.o collision.o paddle.o font_renderer.o utilities.o game
+	rm *.o game

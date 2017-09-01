@@ -14,8 +14,8 @@ std::pair<int, int> CheckCollisionWithPoints(SDL_Rect a, SDL_Rect b, int vel_x, 
     return {result_x, result_y};
   }
 
-  printf("Intersection rect - x: %d, y: %d, w: %d, h: %d\n", result_rect.x,
-    result_rect.y, result_rect.w, result_rect.h);
+  // printf("Intersection rect - x: %d, y: %d, w: %d, h: %d\n", result_rect.x,
+  //   result_rect.y, result_rect.w, result_rect.h);
 
   // move back horizontally if moving faster and horizontal pen
   if ((abs(vel_x) >= abs(vel_y)) && (result_rect.w > 0)) {
