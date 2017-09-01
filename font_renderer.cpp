@@ -21,7 +21,7 @@ FontRenderer::~FontRenderer() {
 std::string FontRenderer::FontPath(FontName name) {
   switch(name) {
     case FontName::FORWARD:
-      return "assets/textures/bg.png";
+      return "assets/fonts/fff-forward.ttf";
       break;
     case FontName::TOTAL_NUM_FONTS:
       printf("Tried to access texture for TOTAL_NUM_FONTS!\n");
