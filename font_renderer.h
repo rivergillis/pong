@@ -30,11 +30,14 @@ class FontRenderer {
   // Dealloc
   ~FontRenderer();
 
+  int SizeFont(FontName name, int size, const std::string& text, int* w, int* h);
+
+  // TODO: make this private
   std::string FontPath(FontName name);  
 
   void RenderFont(SDL_Renderer* renderer, FontName name, int size,
     int x, int y, const std::string& text, SDL_Color text_color);
-    
+
  private:
   // vector of font sizes to font maps
   //  each font map maps integer point size to Fonts

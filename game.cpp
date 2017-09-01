@@ -2,6 +2,7 @@
 
 #include "texture.h"
 #include "texture_pack.h"
+#include "font_renderer.h"
 #include "ball.h"
 #include "paddle.h"
 #include "constants.h"
@@ -177,7 +178,9 @@ void GameLoop(TexturePack* textures) {
   double delta_time = 0;
 
   SDL_Color text_color = { 255, 255, 255, 255 };
-  score_font_texture.LoadFromRenderedText("0  0", text_color);  
+  score_font_texture.LoadFromRenderedText("0  0", text_color);
+
+  FontRenderer font_renderer;
 
   while (!quit) {
     time_last = time_now;
@@ -232,7 +235,20 @@ void GameLoop(TexturePack* textures) {
     ball.Render(textures->GetTexture(TextureName::BALL));
 
     // Render text
-    score_font_texture.Render((constants::SCREEN_WIDTH - score_font_texture.GetWidth()) / 2, 10);
+    int text_width = 0;
+    int text_height = 0;
+    std::ostringstream score_stream;
+    score_stream << player_score << "  " << ai_score;
+
+    std::string score_text = score_stream.str();
+    
+    if (font_renderer.SizeFont(FontName::FORWARD, 42, score_text, &text_width, &text_height) != 0) {
+      printf("Failure to size font!\n");
+    }
+
+    font_renderer.RenderFont(renderer, FontName::FORWARD, 42, 
+    /*x=*/(constants::SCREEN_WIDTH - text_width) / 2, /*y=*/10, score_text, text_color);
+    // score_font_texture.Render((constants::SCREEN_WIDTH - score_font_texture.GetWidth()) / 2, 10);
 
     switch (collision) {
       case CollisionType::WALL:
