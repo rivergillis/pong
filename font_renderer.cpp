@@ -71,7 +71,7 @@ void FontRenderer::RenderFont(SDL_Renderer* renderer, FontName name, int size,
 
   //printf("In RenderFont with text=%s", text.c_str());
   //printf(" - color=%d,%d,%d,%d\n", text_color.r, text_color.g, text_color.b, text_color.a);
-  DbgFonts();
+  // DbgFonts();
 
   // If we don't have the font in this size yet, make one
   if (font_map->count(size) == 0) {
