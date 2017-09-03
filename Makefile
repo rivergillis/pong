@@ -3,7 +3,7 @@ SDLLIBS = -lSDL2 -lSDL2_image -lSDL2_mixer -lSDL2_ttf
 RELEASE = -c -O3 
 DEBUG = -c -g -D_DEBUG
 CSTD = -std=c++14
-CFLAGS = -Wall $(RELEASE) $(CSTD)
+CFLAGS = -Wall $(DEBUG) $(CSTD)
 
 game: game.o texture_pack.o texture.o ball.o collision.o paddle.o font_renderer.o utilities.o
 	$(CC) $(SDLLIBS) game.o texture_pack.o texture.o ball.o collision.o paddle.o font_renderer.o utilities.o -o game

@@ -21,10 +21,6 @@ SDL_Window* window = nullptr;
 //The window renderer
 SDL_Renderer* renderer = nullptr;
 
-TTF_Font* score_font = nullptr;
-
-Texture score_font_texture;
-
 Mix_Chunk* bop = nullptr;
 Mix_Chunk* boop = nullptr;
 
@@ -111,13 +107,6 @@ bool LoadMedia(TexturePack* textures) {
 		printf( "Failed to load boop sound effect! SDL_mixer Error: %s\n", Mix_GetError() );
 		success = false;
   }
-  
-  score_font = TTF_OpenFont("assets/fonts/fff-forward.ttf", 42);
-  if (score_font == nullptr) {
-    printf("Error: Failed to open font fff-forward.ttf! Error: %s\n", TTF_GetError());
-  } else {
-    score_font_texture.Init(renderer, score_font);
-  }
 
   return success;
 }
@@ -128,9 +117,6 @@ void Close(TexturePack* textures) {
     Texture* current = textures->GetTexture(static_cast<TextureName>(i));
     current->Free();    
   }
-
-  TTF_CloseFont(score_font);
-  score_font = nullptr;
 
   //Destroy window
   SDL_DestroyRenderer(renderer);
@@ -178,7 +164,6 @@ void GameLoop(TexturePack* textures) {
   double delta_time = 0;
 
   SDL_Color text_color = { 255, 255, 255, 255 };
-  score_font_texture.LoadFromRenderedText("0  0", text_color);
 
   FontRenderer font_renderer;
 
@@ -200,25 +185,10 @@ void GameLoop(TexturePack* textures) {
 
     ai.Autopilot(ball.GetCollider());
 
-    int old_player_score = player_score;
-    int old_ai_score = ai_score;
-
     // Paddles must move before ball!
     ai.Move(delta_time);
     player.Move(delta_time);
     CollisionType collision = ball.Move(delta_time, ball_colliders, &player_score, &ai_score);
-
-    if (player_score != old_player_score || ai_score != old_ai_score) {
-      std::ostringstream ss;
-      ss << player_score << "  " << ai_score;
-      score_font_texture.LoadFromRenderedText(ss.str(), text_color);
-    }
-
-    if (player_score != old_player_score) {
-      printf("Player has scored! Player Score: %d\n", player_score);
-    } else if (ai_score != old_ai_score) {
-      printf("AI has scored! AI Score: %d\n", ai_score);
-    }
 
     //Clear screen
     SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
@@ -248,7 +218,6 @@ void GameLoop(TexturePack* textures) {
 
     font_renderer.RenderFont(renderer, FontName::FORWARD, 42, 
     /*x=*/(constants::SCREEN_WIDTH - text_width) / 2, /*y=*/10, score_text, text_color);
-    // score_font_texture.Render((constants::SCREEN_WIDTH - score_font_texture.GetWidth()) / 2, 10);
 
     switch (collision) {
       case CollisionType::WALL:

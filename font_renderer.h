@@ -32,6 +32,8 @@ class FontRenderer {
 
   int SizeFont(FontName name, int size, const std::string& text, int* w, int* h);
 
+  void DbgFonts();
+
   // TODO: make this private
   std::string FontPath(FontName name);  
 
