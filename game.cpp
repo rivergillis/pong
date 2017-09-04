@@ -219,11 +219,6 @@ void GameLoop(TexturePack* textures) {
     font_renderer.RenderFont(renderer, FontName::FORWARD, 42, 
     /*x=*/(constants::SCREEN_WIDTH - text_width) / 2, /*y=*/10, score_text, text_color);
 
-    // This is a terrible hack due to the font rendering being broken
-    if (player_score == -1) {
-      player_score = 0;
-    }
-
     switch (collision) {
       case CollisionType::WALL:
       case CollisionType::PADDLE:
