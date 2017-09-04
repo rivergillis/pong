@@ -151,7 +151,7 @@ void GameLoop(TexturePack* textures) {
   Paddle player(true);
   Paddle ai(false);
 
-  int player_score = -1;
+  int player_score = 0;
   int ai_score = 0;
 
   std::vector<SDL_Rect*> ball_colliders;

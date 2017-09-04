@@ -48,6 +48,9 @@ class Texture
 	int GetWidth();
 	int GetHeight();
 
+	// Debug only, return the texture pointer
+	SDL_Texture* GetPtr() { return texture_; }
+
  private:
 	//The actual hardware texture
 	SDL_Texture* texture_;

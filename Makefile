@@ -5,14 +5,17 @@ DEBUG = -c -g -D_DEBUG
 CSTD = -std=c++14
 CFLAGS = -Wall $(DEBUG) $(CSTD)
 
-game: game.o texture_pack.o texture.o ball.o collision.o paddle.o font_renderer.o utilities.o
-	$(CC) $(SDLLIBS) game.o texture_pack.o texture.o ball.o collision.o paddle.o font_renderer.o utilities.o -o game
+game: game.o texture_pack.o texture.o ball.o collision.o paddle.o font_renderer.o utilities.o font.o
+	$(CC) $(SDLLIBS) game.o texture_pack.o texture.o ball.o collision.o paddle.o font_renderer.o utilities.o font.o -o game
 
 game.o: game.cpp
 	$(CC) $(CFLAGS) game.cpp
 
 texture.o: texture.cpp texture.h
 	$(CC) $(CFLAGS) texture.cpp
+
+font.o: font.cpp font.h
+	$(CC) $(CFLAGS) font.cpp
 
 ball.o: ball.cpp ball.h
 	$(CC) $(CFLAGS) ball.cpp

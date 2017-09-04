@@ -15,7 +15,7 @@ FontRenderer::~FontRenderer() {
   // Deallocate each TTF_Font*
   for (auto& font_map : fonts_) {
     for (auto& font_map_pair : font_map) {
-      TTF_CloseFont(font_map_pair.second.ttf);
+      TTF_CloseFont(font_map_pair.second.GetTTF());
     }
   }
 }
@@ -49,7 +49,7 @@ int FontRenderer::SizeFont(FontName name, int size, const std::string& text, int
     TTF_CloseFont(new_font);
   } else {
     // We already have made this font, test that
-    return_val = TTF_SizeText((*font_map)[size].ttf, text.c_str(), w, h);
+    return_val = TTF_SizeText((*font_map)[size].GetTTF(), text.c_str(), w, h);
   }
 
   return return_val;
@@ -69,47 +69,47 @@ void FontRenderer::RenderFont(SDL_Renderer* renderer, FontName name, int size,
   if (name == FontName::TOTAL_NUM_FONTS) { return; }
   std::unordered_map<int, Font>* font_map = &fonts_[static_cast<int>(name)];
 
-  //printf("In RenderFont with text=%s", text.c_str());
-  //printf(" - color=%d,%d,%d,%d\n", text_color.r, text_color.g, text_color.b, text_color.a);
-  // DbgFonts();
 
   // If we don't have the font in this size yet, make one
   if (font_map->count(size) == 0) {
     printf("Making and rendering this font for the first time!\n");
-    TTF_Font* new_font = TTF_OpenFont(FontPath(name).c_str(), size);
-    if (new_font == nullptr) {
+    TTF_Font* new_ttf = TTF_OpenFont(FontPath(name).c_str(), size);
+    if (new_ttf == nullptr) {
       printf("Error: Failed to open font! Message: %s\n", TTF_GetError());
       return;
     }
 
-    Texture new_texture(renderer, new_font);
-    new_texture.LoadFromRenderedText(text, text_color);
+    // Create a new Font with the ttf and renderer
+    Font new_font(new_ttf, renderer);
 
-    // Go ahead and render it while we're here
-    new_texture.Render(x, y);
+    // Render the text, then the texture
+    new_font.GetTexture()->LoadFromRenderedText(text, text_color);
+    new_font.GetTexture()->Render(x, y);
 
-    // Add it to the map and leave
-    (*font_map)[size] = {new_font, new_texture, text, text_color};
+    // Move the new font into our map
+    (*font_map)[size] = std::move(new_font);
+
     return;
   }
 
   // If we do have the font in this size, check if it is the same rendering
   Font* font = &(*font_map)[size];
-  if (font->text == text && ColorsEqual(font->text_color, text_color)) {
+  if (font->GetText() == text && ColorsEqual(font->GetColor(), text_color)) {
     // This is the same as the previous rendering, so just use it.
-    font->texture.Render(x, y);
+    font->GetTexture()->Render(x, y);
   } else {
     // This is a new rendering text or color, remake the texture
     printf("Rendering this font for the first time!\n");
-    font->texture.LoadFromRenderedText(text, text_color);
-    font->texture.Render(x, y);
+    font->GetTexture()->LoadFromRenderedText(text, text_color);
+    font->GetTexture()->Render(x, y);
 
     // Update the Font
-    font->text = text;
-    font->text_color = text_color;
+    font->SetText(text);
+    font->SetColor(text_color);
   }
 }
 
+/*
 void FontRenderer::DbgFonts() {
   // Deallocate each TTF_Font*
   int size = 0;
@@ -119,6 +119,7 @@ void FontRenderer::DbgFonts() {
     for (auto& font_map_pair : font_map) {
       printf("\tSize: %d", inner_size);
       printf("\tTTF: %016" PRIxPTR, (uintptr_t)font_map_pair.second.ttf);
+      printf("\tTexture: %016" PRIxPTR, (uintptr_t)font_map_pair.second.texture.GetPtr());
       printf("\tText: %s", font_map_pair.second.text.c_str());
       SDL_Color c = font_map_pair.second.text_color;
       printf("\tColor: %d, %d, %d, %d\n", c.r, c.g, c.b, c.a);
@@ -127,3 +128,4 @@ void FontRenderer::DbgFonts() {
     size += 1;
   }
 }
+*/

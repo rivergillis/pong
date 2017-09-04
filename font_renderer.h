@@ -2,6 +2,7 @@
 #define FONT_RENDERER_H_
 
 #include "texture.h"
+#include "font.h"
 
 #include <unordered_map>
 #include <vector>
@@ -15,13 +16,6 @@ enum class FontName {
   TOTAL_NUM_FONTS
 };
 
-struct Font {
-  TTF_Font* ttf = nullptr;
-  Texture texture;
-  std::string text = "";
-  SDL_Color text_color;
-};
-
 class FontRenderer {
  public:
   // Init
@@ -32,7 +26,7 @@ class FontRenderer {
 
   int SizeFont(FontName name, int size, const std::string& text, int* w, int* h);
 
-  void DbgFonts();
+  // void DbgFonts();
 
   // TODO: make this private
   std::string FontPath(FontName name);  
