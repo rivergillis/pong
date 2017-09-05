@@ -1,3 +1,11 @@
+// font.h
+// Author: River Gillis
+//
+// Font holds a TTF_Font* (that it does not own), along with a texture
+// that the ttf was rendered to, and information about the rendering.
+// Fonts are used to associate textures of text to the information
+// about those textures.
+
 #ifndef FONT_H_
 #define FONT_H_
 
@@ -8,6 +16,7 @@
 
 class Font {
  public:
+  // TODO: Remove this
   Font();
 
   Font(TTF_Font* ttf, SDL_Renderer* renderer);
