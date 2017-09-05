@@ -4,6 +4,8 @@
 #include <cinttypes>
 #include <cstdint>
 
+// Construct empty unordered_maps at each FontName of @fonts_
+// Not sure if this is necessary, but hey it's explicit and what we want
 FontRenderer::FontRenderer() {
   fonts_.reserve(static_cast<int>(FontName::TOTAL_NUM_FONTS));
   for (int i = 0; i < static_cast<int>(FontName::TOTAL_NUM_FONTS); ++i) {
@@ -11,6 +13,8 @@ FontRenderer::FontRenderer() {
   }
 }
 
+// Deallocate every TTF in @fonts_
+// TODO: test if we can move this to ~Font()
 FontRenderer::~FontRenderer() {
   // Deallocate each TTF_Font*
   for (auto& font_map : fonts_) {
@@ -34,6 +38,7 @@ std::string FontRenderer::FontPath(FontName name) {
 
 int FontRenderer::SizeFont(FontName name, int size, const std::string& text, int* w, int* h) {
   if (name == FontName::TOTAL_NUM_FONTS) { return -1; }
+  // @font_map: A map of font point size to Font objects for font @name
   std::unordered_map<int, Font>* font_map = &fonts_[static_cast<int>(name)];
 
   int return_val = 0;
@@ -94,6 +99,7 @@ void FontRenderer::RenderFont(SDL_Renderer* renderer, FontName name, int size,
 
   // If we do have the font in this size, check if it is the same rendering
   Font* font = &(*font_map)[size];
+  // TODO: Define equality for Font objects
   if (font->GetText() == text && ColorsEqual(font->GetColor(), text_color)) {
     // This is the same as the previous rendering, so just use it.
     font->GetTexture()->Render(x, y);
