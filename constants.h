@@ -1,3 +1,9 @@
+// constants.h
+// Author: River Gillis
+//
+// Defines global constants for the application.
+// contained within a constants namespace.
+
 #ifndef CONSTANTS_H_
 #define CONSTANTS_H_
 
