@@ -7,7 +7,7 @@
 //
 // Usage:
 //  Ball ball;
-//  while (gameloop) {
+//  while (game_loop) {
 //    ball.Move(delta, colliders, &player_score, &ai_score);
 //    ball.Render(&ball_texture);
 //  }
