@@ -7,6 +7,7 @@
 #include "paddle.h"
 #include "constants.h"
 #include "collision.h"
+#include "gamestate.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
@@ -115,7 +116,7 @@ void Close(TexturePack* textures) {
   //Free loaded images
   for (int i = 0; i < static_cast<int>(TextureName::TOTAL_NUM_TEXTURES); ++i) {
     Texture* current = textures->GetTexture(static_cast<TextureName>(i));
-    current->Free();    
+    current->Free();
   }
 
   //Destroy window
@@ -137,11 +138,30 @@ void Close(TexturePack* textures) {
   SDL_Quit();
 }
 
-void PrintRect(SDL_Rect* rect) {
-  printf("Rect - x: %d, y: %d, w: %d, h: %d\n", rect->x, rect->y, rect->w, rect->h);
+void MenuLoop() {}
+
+// TODO: Change time_spent and state in the main game loop
+bool CheckIfDoneWaiting(GameState* state, double* time_spent) {
+  if (*state != GameState::WAITING) {
+    printf("Error: Checking if done waiting while not waiting!\n");
+    return true;
+  }
+
+  printf("Checking if done waiting with time spent = %f\n", *time_spent / 1000);
+  if ((*time_spent / 1000) >= constants::WAIT_TIME_SECONDS) {
+    *state = GameState::PLAYING;
+    *time_spent = 0;
+    return true;
+  }
+  return false;
 }
 
-void GameLoop(TexturePack* textures) {
+void GameLoop(TexturePack* textures, GameState* state) {
+  // should not enter the gameloop except by menu
+  if (*state != GameState::MENU) {
+    printf("Error, entered gameloop not by menu!\n");
+    return;
+  }
   bool quit = false;
 
   SDL_Event e;
@@ -166,12 +186,23 @@ void GameLoop(TexturePack* textures) {
   SDL_Color text_color = { 255, 255, 255, 255 };
 
   FontRenderer font_renderer;
+  
+  double time_spent_waiting = 0;
 
   while (!quit) {
     time_last = time_now;
     time_now = SDL_GetPerformanceCounter();
  
     delta_time = ((time_now - time_last)*1000 / (double)SDL_GetPerformanceFrequency());
+
+    // waiting before launching the ball
+    if (*state == GameState::WAITING) {
+      ball.SetVelocityMultiplier(0);
+      time_spent_waiting += delta_time;
+      if (CheckIfDoneWaiting(state, &time_spent_waiting)) {
+        ball.SetVelocityMultiplier(1);
+      }
+    }
 
     //Handle events on queue
     while(SDL_PollEvent(&e) != 0) {
@@ -226,6 +257,7 @@ void GameLoop(TexturePack* textures) {
         break; 
       case CollisionType::SCORE:
         Mix_PlayChannel(-1, boop, 0);
+        *state = GameState::WAITING;
         break;
       default: break;
     }
@@ -237,6 +269,7 @@ void GameLoop(TexturePack* textures) {
 
 int main(int argc, char *args[]) {
   TexturePack textures;
+  GameState state = GameState::LOADING;
 
   if (!Init(&textures)) {
     printf("Failed to initialize main game!\n");
@@ -248,7 +281,10 @@ int main(int argc, char *args[]) {
     return -1;
   }
 
-  GameLoop(&textures);
+  state = GameState::MENU;
+  MenuLoop();
+
+  GameLoop(&textures, &state);
 
   Close(&textures);
 

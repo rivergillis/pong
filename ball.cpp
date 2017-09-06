@@ -60,7 +60,7 @@ CollisionType Ball::Move(double delta_time, std::vector<SDL_Rect*>& colliders, i
   CollisionType type = CollisionType::NONE;
 
   //Move the ball left or right
-  int delta_vel_x = double(x_vel_ / (1000.0 / 60)) * delta_time;
+  int delta_vel_x = double(x_vel_ * vel_multiplier / (1000.0 / 60)) * delta_time;
   x_pos_ += delta_vel_x;
   collider_.x = x_pos_;
 
@@ -75,7 +75,7 @@ CollisionType Ball::Move(double delta_time, std::vector<SDL_Rect*>& colliders, i
   }
 
   //Move the dot up or down
-  int delta_vel_y = double(y_vel_ / (1000.0 / 60)) * delta_time;
+  int delta_vel_y = double(y_vel_ * vel_multiplier / (1000.0 / 60)) * delta_time;
   y_pos_ += delta_vel_y;
   collider_.y = y_pos_;
 
