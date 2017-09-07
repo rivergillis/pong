@@ -3,5 +3,7 @@ enum class GameState {
   MENU,
   WAITING,
   PLAYING,
+  WIN,
+  LOSE,
   TOTAL_GAME_STATES
 };

@@ -157,6 +157,8 @@ bool CheckIfDoneWaiting(GameState* state, double* time_spent) {
   return false;
 }
 
+// TODO: Let the font renderer cache multiple versions of the text
+// Idea: give each text rendering an ID to check against (i.e. score_text_id = 0)
 void RenderWaitText(double time_spent_waiting, FontRenderer* font_renderer) {
   SDL_Color text_color = { 255, 255, 255, 255 };  
   int text_width = 0;
@@ -175,12 +177,60 @@ void RenderWaitText(double time_spent_waiting, FontRenderer* font_renderer) {
   /*y=*/(constants::SCREEN_HEIGHT - text_height - 100) / 2, time_text, text_color);
 }
 
-void GameLoop(TexturePack* textures, GameState* state) {
+// TODO: selected_option should not be a ptr
+void RenderEndMenu(FontRenderer* font_renderer, GameState* state, int* selected_option) {
+  std::string restart_text = "Restart";
+  // TODO: instead of ending, make the option to go back to main menu
+  std::string end_text = "End";
+  std::string state_text = "Sorry, you lost.";
+  if (*state == GameState::WIN) {
+    state_text = "Congratulations, you win!";
+  }
+
+  SDL_Color original_color = { 255, 255, 255, 255 };
+  SDL_Color selected_color = { 22, 111, 255, 255 };  
+  SDL_Color text_color = original_color;
+  int text_width = 0;
+  int text_height = 0;
+
+  if (font_renderer->SizeFont(FontName::FORWARD, 42, state_text, &text_width, &text_height) != 0) {
+    printf("Failure to size font!\n");
+  }
+
+  font_renderer->RenderFont(renderer, FontName::FORWARD, 42, 
+    /*x=*/(constants::SCREEN_WIDTH - text_width) / 2,
+    /*y=*/(constants::SCREEN_HEIGHT - text_height - 200) / 2, state_text, text_color);
+
+  // Render option 1
+  if (*selected_option == 0) text_color = selected_color;
+  if (font_renderer->SizeFont(FontName::FORWARD, 42, restart_text, &text_width, &text_height) != 0) {
+    printf("Failure to size font!\n");
+  }
+
+  font_renderer->RenderFont(renderer, FontName::FORWARD, 42, 
+    /*x=*/(constants::SCREEN_WIDTH - text_width) / 2,
+    /*y=*/(constants::SCREEN_HEIGHT - text_height) / 2, restart_text, text_color);
+  text_color = original_color;
+
+  // Render option 2
+  if (*selected_option == 1) text_color = selected_color;
+  if (font_renderer->SizeFont(FontName::FORWARD, 42, end_text, &text_width, &text_height) != 0) {
+    printf("Failure to size font!\n");
+  }
+
+  font_renderer->RenderFont(renderer, FontName::FORWARD, 42, 
+    /*x=*/(constants::SCREEN_WIDTH - text_width) / 2,
+    /*y=*/(constants::SCREEN_HEIGHT - text_height + 200) / 2, end_text, text_color);
+}
+
+void GameLoop(TexturePack* textures, GameState* state, int* selected_option) {
   // should not enter the gameloop except by menu
   if (*state != GameState::MENU) {
     printf("Error, entered gameloop not by menu!\n");
     return;
   }
+  *state = GameState::PLAYING;
+
   bool quit = false;
 
   SDL_Event e;
@@ -221,38 +271,98 @@ void GameLoop(TexturePack* textures, GameState* state) {
       if (CheckIfDoneWaiting(state, &time_spent_waiting)) {
         ball.SetVelocityMultiplier(1);
       }
+    } else if (*state == GameState::WIN || *state == GameState::LOSE) {
+      ball.SetVelocityMultiplier(0);
     }
-
-    //Handle events on queue
-    while(SDL_PollEvent(&e) != 0) {
-      //User requests quit
-      if(e.type == SDL_QUIT) {
-        quit = true;
-      }
-
-      player.HandleEvent(e);
-    }
-
-    ai.Autopilot(ball.GetCollider());
-
-    // Paddles must move before ball!
-    ai.Move(delta_time);
-    player.Move(delta_time);
-    CollisionType collision = ball.Move(delta_time, ball_colliders, &player_score, &ai_score);
 
     //Clear screen
-    SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+    SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0xFF);
     SDL_RenderClear(renderer);
 
-    //Render bg
-    textures->GetTexture(TextureName::BG)->Render(0, 0);
-    
-    // Render paddles
-    ai.Render(textures->GetTexture(TextureName::PADDLE));
-    player.Render(textures->GetTexture(TextureName::PADDLE));
+    if (*state == GameState::PLAYING || *state == GameState::WAITING) {
+      //Handle events on queue
+      while(SDL_PollEvent(&e) != 0) {
+        //User requests quit
+        if(e.type == SDL_QUIT) {
+          quit = true;
+        }
 
-    //Render dot
-    ball.Render(textures->GetTexture(TextureName::BALL));
+        player.HandleEvent(e);
+      }
+
+      ai.Autopilot(ball.GetCollider());
+
+      // Paddles must move before ball!
+      ai.Move(delta_time);
+      player.Move(delta_time);
+      CollisionType collision = ball.Move(delta_time, ball_colliders, &player_score, &ai_score);
+
+      //Render bg
+      textures->GetTexture(TextureName::BG)->Render(0, 0);
+      
+      // Render paddles
+      ai.Render(textures->GetTexture(TextureName::PADDLE));
+      player.Render(textures->GetTexture(TextureName::PADDLE));
+
+      //Render dot
+      ball.Render(textures->GetTexture(TextureName::BALL));
+
+      if (*state == GameState::WAITING) {
+        RenderWaitText(time_spent_waiting, &font_renderer);
+      }
+
+      switch (collision) {
+        case CollisionType::WALL:
+        case CollisionType::PADDLE:
+          Mix_PlayChannel( -1, bop, 0 );
+          break; 
+        case CollisionType::SCORE:
+          Mix_PlayChannel(-1, boop, 0);
+          if (player_score >= 5) {
+            *state = GameState::WIN;
+          } else if (ai_score >= 5) {
+            *state = GameState::LOSE;
+          } else {
+            *state = GameState::WAITING;
+          }
+          break;
+        default: break;
+      }
+    } else if (*state == GameState::WIN || *state == GameState::LOSE) {
+      bool has_selected_option = false;
+      while (SDL_PollEvent(&e) != 0) {
+        if(e.type == SDL_QUIT) {
+          quit = true;
+        }
+
+        if (e.type == SDL_KEYDOWN && e.key.repeat == 0) {
+          switch(e.key.keysym.sym) {
+            case SDLK_UP:
+              if (*selected_option > 0) {
+                *selected_option -= 1;
+              }
+              break;
+            case SDLK_DOWN:
+              if (*selected_option < 1) {
+                *selected_option += 1;
+              }
+              break;
+            case SDLK_RETURN:
+              if (*selected_option == 0) {
+                *state = GameState::WAITING;
+                has_selected_option = true;
+              } else if (*selected_option == 1) {
+                quit = true;
+                has_selected_option = true;
+              }
+              break;
+          }
+        }
+      }
+      if (!has_selected_option) {
+        RenderEndMenu(&font_renderer, state, selected_option);
+      }
+    }
 
     // Render text
     int text_width = 0;
@@ -268,22 +378,6 @@ void GameLoop(TexturePack* textures, GameState* state) {
 
     font_renderer.RenderFont(renderer, FontName::FORWARD, 42, 
     /*x=*/(constants::SCREEN_WIDTH - text_width) / 2, /*y=*/10, score_text, text_color);
-
-    if (*state == GameState::WAITING) {
-      RenderWaitText(time_spent_waiting, &font_renderer);      
-    }
-
-    switch (collision) {
-      case CollisionType::WALL:
-      case CollisionType::PADDLE:
-        Mix_PlayChannel( -1, bop, 0 );
-        break; 
-      case CollisionType::SCORE:
-        Mix_PlayChannel(-1, boop, 0);
-        *state = GameState::WAITING;
-        break;
-      default: break;
-    }
 
     //Update screen
     SDL_RenderPresent(renderer);
@@ -304,10 +398,12 @@ int main(int argc, char *args[]) {
     return -1;
   }
 
+  int selected_option = -1;
+
   state = GameState::MENU;
   MenuLoop();
 
-  GameLoop(&textures, &state);
+  GameLoop(&textures, &state, &selected_option);
 
   Close(&textures);
 
