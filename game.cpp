@@ -8,6 +8,7 @@
 #include "constants.h"
 #include "collision.h"
 #include "gamestate.h"
+#include "sound_player.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
@@ -22,9 +23,6 @@ SDL_Window* window = nullptr;
 
 //The window renderer
 SDL_Renderer* renderer = nullptr;
-
-Mix_Chunk* bop = nullptr;
-Mix_Chunk* boop = nullptr;
 
 bool Init(TexturePack* textures) {
   //Initialization flag
@@ -85,7 +83,7 @@ bool Init(TexturePack* textures) {
   return success;
 }
 
-bool LoadMedia(TexturePack* textures) {
+bool LoadMedia(TexturePack* textures, SoundPlayer* sound_player) {
   //Loading success flag
   bool success = true;
 
@@ -98,39 +96,25 @@ bool LoadMedia(TexturePack* textures) {
     }
   }
 
-  bop = Mix_LoadWAV("assets/sfx/blip-fs5.wav");
-  if(bop == nullptr) {
-		printf( "Failed to load bop sound effect! SDL_mixer Error: %s\n", Mix_GetError() );
-		success = false;
-  }
-  
-  boop = Mix_LoadWAV("assets/sfx/blip-fs4.wav");
-  if(boop == nullptr) {
-		printf( "Failed to load boop sound effect! SDL_mixer Error: %s\n", Mix_GetError() );
-		success = false;
-  }
+  sound_player->LoadAllSounds();
 
   return success;
 }
 
-void Close(TexturePack* textures) {
+void Close(TexturePack* textures, SoundPlayer* sound_player) {
   //Free loaded images
   for (int i = 0; i < static_cast<int>(TextureName::TOTAL_NUM_TEXTURES); ++i) {
     Texture* current = textures->GetTexture(static_cast<TextureName>(i));
     current->Free();
   }
 
+  sound_player->FreeAll();
+
   //Destroy window
   SDL_DestroyRenderer(renderer);
   SDL_DestroyWindow(window);
   window = nullptr;
   renderer = nullptr;
-
-  Mix_FreeChunk(bop);
-  bop = nullptr;
-
-  Mix_FreeChunk(boop);
-  boop = nullptr;
 
   //Quit SDL subsystems
   Mix_Quit();
@@ -265,7 +249,7 @@ void RenderMainMenu(FontRenderer* font_renderer, int* selected_option) {
     /*y=*/(constants::SCREEN_HEIGHT - text_height) / 2, quit_text, text_color);
 }
 
-void GameLoop(TexturePack* textures, GameState* state, int* selected_option) {
+void GameLoop(TexturePack* textures, SoundPlayer* sound_player, GameState* state, int* selected_option) {
   // should not enter the gameloop except by menu
   if (*state != GameState::MENU) {
     printf("Error, entered gameloop not by menu!\n");
@@ -354,10 +338,10 @@ void GameLoop(TexturePack* textures, GameState* state, int* selected_option) {
       switch (collision) {
         case CollisionType::WALL:
         case CollisionType::PADDLE:
-          Mix_PlayChannel( -1, bop, 0 );
+          sound_player->PlaySound(SoundName::BALL_HIT);
           break; 
         case CollisionType::SCORE:
-          Mix_PlayChannel(-1, boop, 0);
+          sound_player->PlaySound(SoundName::BALL_SCORE);
           if (player_score >= 5) {
             player_score = 0;
             ai_score = 0;
@@ -469,6 +453,7 @@ void GameLoop(TexturePack* textures, GameState* state, int* selected_option) {
 
 int main(int argc, char *args[]) {
   TexturePack textures;
+  SoundPlayer player;
   GameState state = GameState::LOADING;
 
   if (!Init(&textures)) {
@@ -476,7 +461,7 @@ int main(int argc, char *args[]) {
     return -1;
   }
 
-  if (!LoadMedia(&textures)) {
+  if (!LoadMedia(&textures, &player)) {
     printf("Failed to load media!\n");
     return -1;
   }
@@ -486,9 +471,9 @@ int main(int argc, char *args[]) {
   state = GameState::MENU;
   MenuLoop();
 
-  GameLoop(&textures, &state, &selected_option);
+  GameLoop(&textures, &player, &state, &selected_option);
 
-  Close(&textures);
+  Close(&textures, &player);
 
   return 0;
 }
