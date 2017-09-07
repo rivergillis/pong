@@ -53,6 +53,8 @@ class Paddle {
   // towards the ball
   void Autopilot(SDL_Rect* ball);
 
+  void ResetVel();
+
   SDL_Rect* GetCollider() { return &collider_; }
   
  private:

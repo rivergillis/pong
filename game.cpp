@@ -223,14 +223,54 @@ void RenderEndMenu(FontRenderer* font_renderer, GameState* state, int* selected_
     /*y=*/(constants::SCREEN_HEIGHT - text_height + 200) / 2, end_text, text_color);
 }
 
+void RenderMainMenu(FontRenderer* font_renderer, int* selected_option) {
+  std::string start_text = "Start Game";
+  // TODO: instead of ending, make the option to go back to main menu
+  std::string quit_text = "Quit";
+  std::string title_text = "PONG";
+
+  SDL_Color original_color = { 255, 255, 255, 255 };
+  SDL_Color selected_color = { 22, 111, 255, 255 };  
+  SDL_Color text_color = original_color;
+  int text_width = 0;
+  int text_height = 0;
+
+  if (font_renderer->SizeFont(FontName::FORWARD, 42, title_text, &text_width, &text_height) != 0) {
+    printf("Failure to size font!\n");
+  }
+
+  font_renderer->RenderFont(renderer, FontName::FORWARD, 42, 
+    /*x=*/(constants::SCREEN_WIDTH - text_width) / 2,
+    /*y=*/10, title_text, text_color);
+
+  // Render option 1
+  if (*selected_option == 0) text_color = selected_color;
+  if (font_renderer->SizeFont(FontName::FORWARD, 42, start_text, &text_width, &text_height) != 0) {
+    printf("Failure to size font!\n");
+  }
+
+  font_renderer->RenderFont(renderer, FontName::FORWARD, 42, 
+    /*x=*/(constants::SCREEN_WIDTH - text_width) / 2,
+    /*y=*/(constants::SCREEN_HEIGHT - text_height - 200) / 2, start_text, text_color);
+  text_color = original_color;
+
+  // Render option 2
+  if (*selected_option == 1) text_color = selected_color;
+  if (font_renderer->SizeFont(FontName::FORWARD, 42, quit_text, &text_width, &text_height) != 0) {
+    printf("Failure to size font!\n");
+  }
+
+  font_renderer->RenderFont(renderer, FontName::FORWARD, 42, 
+    /*x=*/(constants::SCREEN_WIDTH - text_width) / 2,
+    /*y=*/(constants::SCREEN_HEIGHT - text_height) / 2, quit_text, text_color);
+}
+
 void GameLoop(TexturePack* textures, GameState* state, int* selected_option) {
   // should not enter the gameloop except by menu
   if (*state != GameState::MENU) {
     printf("Error, entered gameloop not by menu!\n");
     return;
   }
-  *state = GameState::PLAYING;
-
   bool quit = false;
 
   SDL_Event e;
@@ -319,8 +359,14 @@ void GameLoop(TexturePack* textures, GameState* state, int* selected_option) {
         case CollisionType::SCORE:
           Mix_PlayChannel(-1, boop, 0);
           if (player_score >= 5) {
+            player_score = 0;
+            ai_score = 0;
+            player.ResetVel();
             *state = GameState::WIN;
           } else if (ai_score >= 5) {
+            player_score = 0;
+            ai_score = 0;
+            player.ResetVel();
             *state = GameState::LOSE;
           } else {
             *state = GameState::WAITING;
@@ -362,22 +408,59 @@ void GameLoop(TexturePack* textures, GameState* state, int* selected_option) {
       if (!has_selected_option) {
         RenderEndMenu(&font_renderer, state, selected_option);
       }
+    } else if (*state == GameState::MENU) {
+      // TODO: Move this logic somewhere else
+      bool has_selected_option = false;
+      while (SDL_PollEvent(&e) != 0) {
+        if(e.type == SDL_QUIT) {
+          quit = true;
+        }
+
+        if (e.type == SDL_KEYDOWN && e.key.repeat == 0) {
+          switch(e.key.keysym.sym) {
+            case SDLK_UP:
+              if (*selected_option > 0) {
+                *selected_option -= 1;
+              }
+              break;
+            case SDLK_DOWN:
+              if (*selected_option < 1) {
+                *selected_option += 1;
+              }
+              break;
+            case SDLK_RETURN:
+              if (*selected_option == 0) {
+                *state = GameState::WAITING;
+                has_selected_option = true;
+              } else if (*selected_option == 1) {
+                quit = true;
+                has_selected_option = true;
+              }
+              break;
+          }
+        }
+      }
+      if (!has_selected_option) {
+        RenderMainMenu(&font_renderer, selected_option);
+      }
     }
 
-    // Render text
-    int text_width = 0;
-    int text_height = 0;
-    std::ostringstream score_stream;
-    score_stream << player_score << "  " << ai_score;
+    if (*state != GameState::MENU) {
+      // Render text
+      int text_width = 0;
+      int text_height = 0;
+      std::ostringstream score_stream;
+      score_stream << player_score << "  " << ai_score;
 
-    std::string score_text = score_stream.str();
-    
-    if (font_renderer.SizeFont(FontName::FORWARD, 42, score_text, &text_width, &text_height) != 0) {
-      printf("Failure to size font!\n");
+      std::string score_text = score_stream.str();
+      
+      if (font_renderer.SizeFont(FontName::FORWARD, 42, score_text, &text_width, &text_height) != 0) {
+        printf("Failure to size font!\n");
+      }
+
+      font_renderer.RenderFont(renderer, FontName::FORWARD, 42, 
+      /*x=*/(constants::SCREEN_WIDTH - text_width) / 2, /*y=*/10, score_text, text_color);
     }
-
-    font_renderer.RenderFont(renderer, FontName::FORWARD, 42, 
-    /*x=*/(constants::SCREEN_WIDTH - text_width) / 2, /*y=*/10, score_text, text_color);
 
     //Update screen
     SDL_RenderPresent(renderer);

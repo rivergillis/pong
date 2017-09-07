@@ -60,6 +60,10 @@ void Paddle::Autopilot(SDL_Rect* ball) {
   }
 }
 
+void Paddle::ResetVel() {
+  y_vel_ = 0;
+}
+
 void Paddle::Render(Texture* texture) {
   texture->Render(x_pos_, y_pos_);
 }
