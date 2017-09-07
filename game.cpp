@@ -15,6 +15,7 @@
 #include <stdio.h>
 #include <string>
 #include <sstream>
+#include <cmath>
 
 //The window we'll be rendering to
 SDL_Window* window = nullptr;
@@ -156,6 +157,24 @@ bool CheckIfDoneWaiting(GameState* state, double* time_spent) {
   return false;
 }
 
+void RenderWaitText(double time_spent_waiting, FontRenderer* font_renderer) {
+  SDL_Color text_color = { 255, 255, 255, 255 };  
+  int text_width = 0;
+  int text_height = 0;
+  std::ostringstream time_stream;
+  time_stream << int(std::ceil(constants::WAIT_TIME_SECONDS - (time_spent_waiting / 1000.0)));
+
+  std::string time_text = time_stream.str();
+  
+  if (font_renderer->SizeFont(FontName::FORWARD, 42, time_text, &text_width, &text_height) != 0) {
+    printf("Failure to size font!\n");
+  }
+
+  font_renderer->RenderFont(renderer, FontName::FORWARD, 42, 
+  /*x=*/(constants::SCREEN_WIDTH - text_width) / 2,
+  /*y=*/(constants::SCREEN_HEIGHT - text_height - 100) / 2, time_text, text_color);
+}
+
 void GameLoop(TexturePack* textures, GameState* state) {
   // should not enter the gameloop except by menu
   if (*state != GameState::MENU) {
@@ -249,6 +268,10 @@ void GameLoop(TexturePack* textures, GameState* state) {
 
     font_renderer.RenderFont(renderer, FontName::FORWARD, 42, 
     /*x=*/(constants::SCREEN_WIDTH - text_width) / 2, /*y=*/10, score_text, text_color);
+
+    if (*state == GameState::WAITING) {
+      RenderWaitText(time_spent_waiting, &font_renderer);      
+    }
 
     switch (collision) {
       case CollisionType::WALL:

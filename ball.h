@@ -57,7 +57,7 @@ class Ball {
   void Render(Texture* texture);
 
   void SetVelocityMultiplier(double mult) {
-    vel_multiplier = mult;
+    vel_multiplier_ = mult;
   }
 
 private:
@@ -69,7 +69,7 @@ private:
   // To be implemented: resets the position of the ball.
   void ResetBall();
 
-  double vel_multiplier = 1;
+  double vel_multiplier_ = 1;
 
   // The X and Y offsets of the ball
   int x_pos_, y_pos_;

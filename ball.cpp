@@ -60,7 +60,7 @@ CollisionType Ball::Move(double delta_time, std::vector<SDL_Rect*>& colliders, i
   CollisionType type = CollisionType::NONE;
 
   //Move the ball left or right
-  int delta_vel_x = double(x_vel_ * vel_multiplier / (1000.0 / 60)) * delta_time;
+  int delta_vel_x = double(x_vel_ * vel_multiplier_ / (1000.0 / 60)) * delta_time;
   x_pos_ += delta_vel_x;
   collider_.x = x_pos_;
 
@@ -75,7 +75,7 @@ CollisionType Ball::Move(double delta_time, std::vector<SDL_Rect*>& colliders, i
   }
 
   //Move the dot up or down
-  int delta_vel_y = double(y_vel_ * vel_multiplier / (1000.0 / 60)) * delta_time;
+  int delta_vel_y = double(y_vel_ * vel_multiplier_ / (1000.0 / 60)) * delta_time;
   y_pos_ += delta_vel_y;
   collider_.y = y_pos_;
 
@@ -108,6 +108,9 @@ CollisionType Ball::Move(double delta_time, std::vector<SDL_Rect*>& colliders, i
     // printf("Moved ball to x: %d, y: %d\n", x_pos_, y_pos_); 
 
     type = CollisionType::PADDLE;
+
+    // Increase ball speed on paddle hit.
+    SetVelocityMultiplier(vel_multiplier_ + 0.1);    
   }
 
   return type;

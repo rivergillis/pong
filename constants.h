@@ -15,7 +15,7 @@ namespace constants {
   const int WIN_SCORE = 5;
 
   // time spent waiting while ball is held
-  const int WAIT_TIME_SECONDS = 3;
+  const int WAIT_TIME_SECONDS = 2;
 } // namespace constants
 
 #endif
