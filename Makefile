@@ -5,8 +5,12 @@ DEBUG = -c -g -D_DEBUG
 CSTD = -std=c++14
 CFLAGS = -Wall $(DEBUG) $(CSTD)
 
-game: game.o texture_pack.o texture.o ball.o collision.o paddle.o font_renderer.o utilities.o font.o sound_player.o sound.o
-	$(CC) $(SDLLIBS) game.o texture_pack.o texture.o ball.o collision.o paddle.o font_renderer.o utilities.o font.o sound_player.o sound.o -o game
+game: game.o texture_pack.o texture.o ball.o collision.o paddle.o \
+font_renderer.o utilities.o font.o sound_player.o sound.o options.o
+	$(CC) $(SDLLIBS) game.o texture_pack.o texture.o ball.o collision.o \
+	paddle.o font_renderer.o utilities.o font.o sound_player.o sound.o \
+	options.o \
+	-o game
 
 game.o: game.cpp
 	$(CC) $(CFLAGS) game.cpp
@@ -40,6 +44,9 @@ sound_player.o: sound_player.cpp sound_player.h
 
 sound.o: sound.cpp sound.h
 	$(CC) $(CFLAGS) sound.cpp
+
+options.o: options.cpp options.h
+	$(CC) $(CFLAGS) options.cpp
 
 clean:
 	rm *.o game

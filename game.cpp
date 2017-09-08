@@ -9,6 +9,7 @@
 #include "collision.h"
 #include "gamestate.h"
 #include "sound_player.h"
+#include "options.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
@@ -123,8 +124,6 @@ void Close(TexturePack* textures, SoundPlayer* sound_player) {
   SDL_Quit();
 }
 
-void MenuLoop() {}
-
 // TODO: Change time_spent and state in the main game loop
 bool CheckIfDoneWaiting(GameState* state, double* time_spent) {
   if (*state != GameState::WAITING) {
@@ -207,11 +206,13 @@ void RenderEndMenu(FontRenderer* font_renderer, GameState* state, int* selected_
     /*y=*/(constants::SCREEN_HEIGHT - text_height + 200) / 2, end_text, text_color);
 }
 
-void RenderMainMenu(FontRenderer* font_renderer, int* selected_option) {
+void RenderMainMenu(FontRenderer* font_renderer, int* selected_option, Options* options) {
+  //NEXTSTEPS: Render the difficulty options text and let the user pick difficulty
   std::string start_text = "Start Game";
   // TODO: instead of ending, make the option to go back to main menu
   std::string quit_text = "Quit";
   std::string title_text = "PONG";
+  std::string difficulty_text = "Difficulty: <" + options->GetOption("difficulty") + ">";
 
   SDL_Color original_color = { 255, 255, 255, 255 };
   SDL_Color selected_color = { 22, 111, 255, 255 };  
@@ -227,7 +228,7 @@ void RenderMainMenu(FontRenderer* font_renderer, int* selected_option) {
     /*x=*/(constants::SCREEN_WIDTH - text_width) / 2,
     /*y=*/10, title_text, text_color);
 
-  // Render option 1
+  // Render start text
   if (*selected_option == 0) text_color = selected_color;
   if (font_renderer->SizeFont(FontName::FORWARD, 42, start_text, &text_width, &text_height) != 0) {
     printf("Failure to size font!\n");
@@ -238,18 +239,30 @@ void RenderMainMenu(FontRenderer* font_renderer, int* selected_option) {
     /*y=*/(constants::SCREEN_HEIGHT - text_height - 200) / 2, start_text, text_color);
   text_color = original_color;
 
-  // Render option 2
+  // Render difficulty text
   if (*selected_option == 1) text_color = selected_color;
+  if (font_renderer->SizeFont(FontName::FORWARD, 42, difficulty_text, &text_width, &text_height) != 0) {
+    printf("Failure to size font!\n");
+  }
+
+  font_renderer->RenderFont(renderer, FontName::FORWARD, 42, 
+    /*x=*/(constants::SCREEN_WIDTH - text_width) / 2,
+    /*y=*/(constants::SCREEN_HEIGHT - text_height) / 2, difficulty_text, text_color);
+  text_color = original_color;    
+
+  // Render quit text
+  if (*selected_option == 2) text_color = selected_color;
   if (font_renderer->SizeFont(FontName::FORWARD, 42, quit_text, &text_width, &text_height) != 0) {
     printf("Failure to size font!\n");
   }
 
   font_renderer->RenderFont(renderer, FontName::FORWARD, 42, 
     /*x=*/(constants::SCREEN_WIDTH - text_width) / 2,
-    /*y=*/(constants::SCREEN_HEIGHT - text_height) / 2, quit_text, text_color);
+    /*y=*/(constants::SCREEN_HEIGHT - text_height + 200) / 2, quit_text, text_color);
 }
 
-void GameLoop(TexturePack* textures, SoundPlayer* sound_player, GameState* state, int* selected_option) {
+void GameLoop(TexturePack* textures, SoundPlayer* sound_player,
+    Options* options, GameState* state, int* selected_option) {
   // should not enter the gameloop except by menu
   if (*state != GameState::MENU) {
     printf("Error, entered gameloop not by menu!\n");
@@ -408,15 +421,35 @@ void GameLoop(TexturePack* textures, SoundPlayer* sound_player, GameState* state
               }
               break;
             case SDLK_DOWN:
-              if (*selected_option < 1) {
+              if (*selected_option < 2) {
                 *selected_option += 1;
+              }
+              break;
+            case SDLK_LEFT:
+              if (*selected_option == 1) {
+                std::string difficulty_option = options->GetOption("difficulty");
+                if (difficulty_option == "medium") {
+                  options->SetOption("difficulty", "easy");
+                } else if (difficulty_option == "hard") {
+                  options->SetOption("difficulty", "medium");
+                }
+              }
+              break;
+            case SDLK_RIGHT:
+              if (*selected_option == 1) {
+                std::string difficulty_option = options->GetOption("difficulty");
+                if (difficulty_option == "easy") {
+                  options->SetOption("difficulty", "medium");
+                } else if (difficulty_option == "medium") {
+                  options->SetOption("difficulty", "hard");
+                }
               }
               break;
             case SDLK_RETURN:
               if (*selected_option == 0) {
                 *state = GameState::WAITING;
                 has_selected_option = true;
-              } else if (*selected_option == 1) {
+              } else if (*selected_option == 2) {
                 quit = true;
                 has_selected_option = true;
               }
@@ -425,7 +458,9 @@ void GameLoop(TexturePack* textures, SoundPlayer* sound_player, GameState* state
         }
       }
       if (!has_selected_option) {
-        RenderMainMenu(&font_renderer, selected_option);
+        RenderMainMenu(&font_renderer, selected_option, options);
+      } else {
+        *selected_option = -1;
       }
     }
 
@@ -451,9 +486,14 @@ void GameLoop(TexturePack* textures, SoundPlayer* sound_player, GameState* state
   }
 }
 
+void SetDefaultOptions(Options* options) {
+  options->SetOption("difficulty", "medium");
+}
+
 int main(int argc, char *args[]) {
   TexturePack textures;
   SoundPlayer player;
+  Options options;
   GameState state = GameState::LOADING;
 
   if (!Init(&textures)) {
@@ -469,9 +509,9 @@ int main(int argc, char *args[]) {
   int selected_option = -1;
 
   state = GameState::MENU;
-  MenuLoop();
 
-  GameLoop(&textures, &player, &state, &selected_option);
+  SetDefaultOptions(&options);
+  GameLoop(&textures, &player, &options, &state, &selected_option);
 
   Close(&textures, &player);
 
