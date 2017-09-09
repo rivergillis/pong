@@ -60,6 +60,14 @@ class Ball {
     vel_multiplier_ = mult;
   }
 
+  void ResetVelocityMultiplier() {
+    vel_multiplier_ = default_vel_multiplier_;
+  }
+
+  void SetDefaultVelocityMultiplier(double mult) {
+    default_vel_multiplier_ = mult;
+  }
+
 private:
   // Scores against @player_scored.
   // If player_scored is true, ++(*player_score)
@@ -70,6 +78,8 @@ private:
   void ResetBall();
 
   double vel_multiplier_ = 1;
+
+  double default_vel_multiplier_ = 1;
 
   // The X and Y offsets of the ball
   int x_pos_, y_pos_;

@@ -207,7 +207,6 @@ void RenderEndMenu(FontRenderer* font_renderer, GameState* state, int* selected_
 }
 
 void RenderMainMenu(FontRenderer* font_renderer, int* selected_option, Options* options) {
-  //NEXTSTEPS: Render the difficulty options text and let the user pick difficulty
   std::string start_text = "Start Game";
   // TODO: instead of ending, make the option to go back to main menu
   std::string quit_text = "Quit";
@@ -261,6 +260,20 @@ void RenderMainMenu(FontRenderer* font_renderer, int* selected_option, Options* 
     /*y=*/(constants::SCREEN_HEIGHT - text_height + 200) / 2, quit_text, text_color);
 }
 
+void SetGameDifficulty(Paddle* player, Paddle* ai, Ball* ball, Options* options) {
+  std::string difficulty_string = options->GetOption("difficulty");
+  if (difficulty_string == "easy") {
+    ball->SetDefaultVelocityMultiplier(1);
+    ai->SetVelocityMultiplier(0.5);
+  } else if (difficulty_string == "medium") {
+    ball->SetDefaultVelocityMultiplier(1);
+    ai->SetVelocityMultiplier(1);
+  } else {
+    ball->SetDefaultVelocityMultiplier(1);
+    ai->SetVelocityMultiplier(2);
+  }
+}
+
 void GameLoop(TexturePack* textures, SoundPlayer* sound_player,
     Options* options, GameState* state, int* selected_option) {
   // should not enter the gameloop except by menu
@@ -306,7 +319,7 @@ void GameLoop(TexturePack* textures, SoundPlayer* sound_player,
       ball.SetVelocityMultiplier(0);
       time_spent_waiting += delta_time;
       if (CheckIfDoneWaiting(state, &time_spent_waiting)) {
-        ball.SetVelocityMultiplier(1);
+        ball.ResetVelocityMultiplier();
       }
     } else if (*state == GameState::WIN || *state == GameState::LOSE) {
       ball.SetVelocityMultiplier(0);
@@ -433,6 +446,7 @@ void GameLoop(TexturePack* textures, SoundPlayer* sound_player,
                 } else if (difficulty_option == "hard") {
                   options->SetOption("difficulty", "medium");
                 }
+                SetGameDifficulty(&player, &ai, &ball, options);
               }
               break;
             case SDLK_RIGHT:
@@ -443,6 +457,7 @@ void GameLoop(TexturePack* textures, SoundPlayer* sound_player,
                 } else if (difficulty_option == "medium") {
                   options->SetOption("difficulty", "hard");
                 }
+                SetGameDifficulty(&player, &ai, &ball, options);                
               }
               break;
             case SDLK_RETURN:

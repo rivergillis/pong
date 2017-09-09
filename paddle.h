@@ -56,6 +56,10 @@ class Paddle {
   void ResetVel();
 
   SDL_Rect* GetCollider() { return &collider_; }
+
+  void SetVelocityMultiplier(double mult) {
+    vel_multiplier_ = mult;
+  }
   
  private:
   // The X and Y offsets of the paddle
@@ -63,6 +67,8 @@ class Paddle {
   
   // The velocity of the paddle, vert only
   int y_vel_;
+
+  double vel_multiplier_ = 1;
 
   // Paddle's collision box
   SDL_Rect collider_;

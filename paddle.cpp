@@ -37,7 +37,7 @@ void Paddle::HandleEvent(SDL_Event& e) {
 }
 
 void Paddle::Move(double delta_time) {
-  int delta_vel_y = double(y_vel_ / (1000.0 / 60)) * delta_time;
+  int delta_vel_y = double(y_vel_ * vel_multiplier_ / (1000.0 / 60)) * delta_time;
   y_pos_ += delta_vel_y;
 
   if (y_pos_ < 0) {
