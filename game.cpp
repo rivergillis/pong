@@ -211,7 +211,7 @@ void RenderMainMenu(FontRenderer* font_renderer, int* selected_option, Options* 
   // TODO: instead of ending, make the option to go back to main menu
   std::string quit_text = "Quit";
   std::string title_text = "PONG";
-  std::string difficulty_text = "Difficulty: <" + options->GetOption("difficulty") + ">";
+  std::string difficulty_text = "Difficulty: <" + options->GetOptionText("difficulty") + ">";
 
   SDL_Color original_color = { 255, 255, 255, 255 };
   SDL_Color selected_color = { 22, 111, 255, 255 };  
@@ -261,7 +261,7 @@ void RenderMainMenu(FontRenderer* font_renderer, int* selected_option, Options* 
 }
 
 void SetGameDifficulty(Paddle* player, Paddle* ai, Ball* ball, Options* options) {
-  std::string difficulty_string = options->GetOption("difficulty");
+  std::string difficulty_string = options->GetOptionText("difficulty");
   if (difficulty_string == "easy") {
     ball->SetDefaultVelocityMultiplier(1);
     ai->SetVelocityMultiplier(0.5);
@@ -440,7 +440,7 @@ void GameLoop(TexturePack* textures, SoundPlayer* sound_player,
               break;
             case SDLK_LEFT:
               if (*selected_option == 1) {
-                std::string difficulty_option = options->GetOption("difficulty");
+                std::string difficulty_option = options->GetOptionText("difficulty");
                 if (difficulty_option == "medium") {
                   options->SetOption("difficulty", "easy");
                 } else if (difficulty_option == "hard") {
@@ -451,7 +451,7 @@ void GameLoop(TexturePack* textures, SoundPlayer* sound_player,
               break;
             case SDLK_RIGHT:
               if (*selected_option == 1) {
-                std::string difficulty_option = options->GetOption("difficulty");
+                std::string difficulty_option = options->GetOptionText("difficulty");
                 if (difficulty_option == "easy") {
                   options->SetOption("difficulty", "medium");
                 } else if (difficulty_option == "medium") {
